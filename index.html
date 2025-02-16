@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BudgetTrack</title>
+  <!-- Google Font: Nunito -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link 
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&display=swap" 
+    rel="stylesheet"
+  />
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- SIDEBAR (Desktop-First) -->
+  <aside class="sidebar">
+    <div class="logo">Budget<br/>Track</div>
+    <nav>
+      <ul>
+        <li><a href="#" class="active">Dashboard</a></li>
+        <li><a href="#">Transactions</a></li>
+        <li><a href="#">Settings</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="content">
+    
+    <!-- HERO SECTION -->
+    <section class="hero" data-animate="fade-slide-down">
+      <div class="hero-graphics"></div>
+      <div class="hero-inner">
+        <h1>Smart Budgeting,<br/> Simplified</h1>
+        <p>
+          Track your income and expenses in one place—<br/>
+          enjoy real-time insights and personalized goals.
+        </p>
+      </div>
+    </section>
+
+    <!-- DASHBOARD SECTION: CHART + CALENDAR + ALERTS -->
+    <section class="dashboard">
+      <!-- Chart Placeholder -->
+      <div class="chart-container" data-animate="fade-zoom" data-delay="0.2s">
+        <h2>Spent vs. Saved</h2>
+        <div class="chart-placeholder">
+          <div class="pie-outer">
+            <div class="pie-inner"></div>
+          </div>
+          <div class="chart-legend">
+            <div><span class="spent-dot"></span> Spent</div>
+            <div><span class="saved-dot"></span> Saved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calendar -->
+      <div class="calendar-container" data-animate="fade-zoom" data-delay="0.4s">
+        <h2>Calendar</h2>
+        <div class="calendar-grid">
+          <!-- Example days; replace with JS or dynamic code later -->
+          <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div>
+          <div>8</div><div>9</div><div>10</div><div>11</div><div>12</div><div>13</div><div>14</div>
+          <div>15</div><div>16</div><div>17</div><div>18</div><div>19</div><div>20</div><div>21</div>
+          <div>22</div><div>23</div><div>24</div><div>25</div><div>26</div><div>27</div><div>28</div>
+          <div>29</div><div>30</div><div>31</div>
+        </div>
+      </div>
+
+      <!-- Alerts -->
+      <div class="alerts-container" data-animate="fade-slide-up" data-delay="0.6s">
+        <h2>Alerts</h2>
+        <ul class="alerts-list">
+          <li class="alert warning">You’re nearing your monthly spending limit!</li>
+          <li class="alert success">Hooray! You saved 20% more this week.</li>
+          <li class="alert info">Don’t forget to add your weekend transactions.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- SUMMARY CIRCLES -->
+    <section class="summary">
+      <div class="stat-bubble" data-animate="fade-zoom" data-delay="0.8s">
+        <span class="stat-label">Total Balance</span>
+        <span class="stat-value" id="balance">$0.00</span>
+      </div>
+      <div class="stat-bubble" data-animate="fade-zoom" data-delay="1.0s">
+        <span class="stat-label">Total Income</span>
+        <span class="stat-value" id="income">$0.00</span>
+      </div>
+      <div class="stat-bubble" data-animate="fade-zoom" data-delay="1.2s">
+        <span class="stat-label">Total Expenses</span>
+        <span class="stat-value" id="expenses">$0.00</span>
+      </div>
+    </section>
+
+    <!-- TRANSACTION FORM -->
+    <section class="transaction-form" data-animate="fade-slide-up" data-delay="1.4s">
+      <h2>Add a Transaction</h2>
+      <div class="fluid-form">
+        <input type="text" id="desc" placeholder="Description (e.g. Coffee)" />
+        <input type="number" id="amount" placeholder="Amount (e.g. 4.50)" />
+        <select id="type">
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
+        </select>
+        <button class="btn-add" onclick="addTransaction()">Add</button>
+      </div>
+    </section>
+
+    <!-- RECENT TRANSACTIONS LIST -->
+    <section class="transactions" data-animate="fade-slide-up" data-delay="1.6s">
+      <h2>Recent Transactions</h2>
+      <ul id="transaction-list"></ul>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>BudgetTrack • Version 1.0</p>
+  </footer>
+
+  <!-- SCRIPT -->
+  <script src="script.js"></script>
+</body>
+</html>

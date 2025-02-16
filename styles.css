@@ -1,0 +1,471 @@
+/* ==============================
+   1. ROOT VARIABLES
+============================== */
+:root {
+  /* Background gradient for the main page */
+  --bg-gradient: linear-gradient(145deg, #ede7ff, #f6f4ff);
+  
+  /* Accent colors (pastels) */
+  --accent1: #7f77ff; /* lavender/purple */
+  --accent2: #b8b2ff; /* lighter lavender */
+  
+  /* Text colors */
+  --text-color: #333;
+
+  /* Alerts */
+  --warning-bg: #fdecd5;
+  --warning-text: #8a5400;
+  --success-bg: #daf5db;
+  --success-text: #227b30;
+  --info-bg: #e0ebff;
+  --info-text: #234477;
+}
+
+/* ==============================
+   2. GLOBAL RESET
+============================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  display: flex;
+  min-height: 100vh;
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text-color);
+}
+ul {
+  list-style: none;
+}
+a {
+  text-decoration: none;
+}
+
+/* ==============================
+   3. SIDEBAR
+============================== */
+.sidebar {
+  width: 260px;
+  background: linear-gradient(140deg, #3e3a7d, #484399);
+  color: #ddd;
+  padding: 40px 20px;
+  border-top-right-radius: 40px;
+  border-bottom-right-radius: 40px;
+  box-shadow: 3px 0 10px rgba(0,0,0,0.05);
+}
+.logo {
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 50px;
+  line-height: 1.2;
+}
+.sidebar ul li {
+  margin: 25px 0;
+}
+.sidebar ul li a {
+  color: #cbc9fa;
+  font-size: 16px;
+  transition: color 0.3s;
+}
+.sidebar ul li a.active,
+.sidebar ul li a:hover {
+  color: #fff;
+}
+
+/* ==============================
+   4. MAIN CONTENT WRAPPER
+============================== */
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ==============================
+   5. HERO SECTION
+============================== */
+.hero {
+  position: relative;
+  background: linear-gradient(160deg, var(--accent1) 0%, var(--accent2) 100%);
+  height: 420px;
+  border-bottom-left-radius: 60px;
+  border-bottom-right-radius: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  color: #fff;
+}
+.hero-graphics {
+  /* Optional: place an illustration or shapes in background
+     e.g. background: url('assets/illustration.svg') no-repeat center/contain; 
+  */
+}
+.hero-inner {
+  max-width: 700px;
+}
+.hero-inner h1 {
+  font-size: 46px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+.hero-inner p {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* ==============================
+   6. DASHBOARD (Chart + Calendar + Alerts)
+============================== */
+.dashboard {
+  max-width: 1200px;
+  margin: -70px auto 40px; /* overlaps hero */
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  position: relative;
+  z-index: 3;
+  padding: 0 20px;
+}
+
+/* ----- Chart Container ----- */
+.chart-container {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 12px rgba(0,0,0,0.05);
+  padding: 20px;
+  flex: 1 1 300px;
+  min-width: 280px;
+  text-align: center;
+}
+.chart-container h2 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+.chart-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.pie-outer {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  /* Example gradient: 60% spent, 40% saved */
+  background: conic-gradient(#ff9f9f 0% 60%, #b8b2ff 60% 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.pie-inner {
+  width: 80px;
+  height: 80px;
+  background: #f6f4ff;
+  border-radius: 50%;
+}
+.chart-legend {
+  display: flex;
+  gap: 20px;
+}
+.spent-dot,
+.saved-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+.spent-dot {
+  background: #ff9f9f;
+}
+.saved-dot {
+  background: #b8b2ff;
+}
+
+/* ----- Calendar Container ----- */
+.calendar-container {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 12px rgba(0,0,0,0.05);
+  flex: 1 1 300px;
+  min-width: 280px;
+  text-align: center;
+  padding: 20px;
+}
+.calendar-container h2 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+.calendar-grid div {
+  background: #ede7ff;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* ----- Alerts Container ----- */
+.alerts-container {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 12px rgba(0,0,0,0.05);
+  flex: 1 1 300px;
+  min-width: 280px;
+  padding: 20px;
+}
+.alerts-container h2 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.alert {
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.warning {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+}
+.success {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+.info {
+  background: var(--info-bg);
+  color: var(--info-text);
+}
+
+/* ==============================
+   7. SUMMARY CIRCLES
+============================== */
+.summary {
+  display: flex;
+  gap: 20px;
+  max-width: 1000px;
+  margin: 20px auto 40px;
+  flex-wrap: wrap;
+  justify-content: center;
+  position: relative;
+  z-index: 3;
+  padding: 0 20px;
+}
+.stat-bubble {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+  justify-content: center;
+  transition: transform 0.3s;
+}
+.stat-bubble:hover {
+  transform: scale(1.05);
+}
+.stat-label {
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #555;
+}
+.stat-value {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* ==============================
+   8. TRANSACTION FORM
+============================== */
+.transaction-form {
+  max-width: 800px;
+  margin: 20px auto;
+  text-align: center;
+}
+.transaction-form h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+.fluid-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+.fluid-form input,
+.fluid-form select {
+  padding: 12px;
+  font-size: 14px;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  background: transparent;
+  outline: none;
+  width: 200px;
+  transition: border-color 0.2s;
+}
+.fluid-form input:focus,
+.fluid-form select:focus {
+  border-color: #666;
+}
+.btn-add {
+  background: #444;
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 24px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.btn-add:hover {
+  background: #222;
+}
+
+/* ==============================
+   9. TRANSACTIONS LIST
+============================== */
+.transactions {
+  max-width: 800px;
+  margin: 20px auto 40px;
+  padding: 0 20px;
+}
+.transactions h2 {
+  font-size: 20px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+#transaction-list li {
+  background: #fff;
+  margin-bottom: 10px;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.04);
+  display: flex;
+  justify-content: space-between;
+  transition: transform 0.2s;
+}
+#transaction-list li:hover {
+  transform: translateX(5px);
+}
+
+/* ==============================
+   10. FOOTER
+============================== */
+footer {
+  text-align: center;
+  padding: 15px;
+  background: linear-gradient(140deg, #3e3a7d, #484399);
+  color: #ddd;
+  font-size: 14px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+
+/* ==============================
+   11. RESPONSIVENESS
+============================== */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none; /* Hide side nav on mobile, or add a toggle if you prefer */
+  }
+  .hero {
+    height: 320px;
+  }
+  .hero-inner h1 {
+    font-size: 32px;
+  }
+  .dashboard {
+    margin: -50px auto 20px;
+  }
+}
+
+/* ==============================
+   12. ANIMATIONS
+============================== */
+/* Hide elements if they have data-animate. They fade in on load. */
+[data-animate] {
+  opacity: 0;
+}
+
+/* Fade & Slide Down */
+[data-animate="fade-slide-down"] {
+  transform: translateY(-30px);
+  animation: fadeSlideDown 1s ease forwards;
+}
+@keyframes fadeSlideDown {
+  0% {
+    opacity: 0; 
+    transform: translateY(-30px);
+  }
+  100% {
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+/* Fade & Zoom */
+[data-animate="fade-zoom"] {
+  transform: scale(0.9);
+  animation: fadeZoom 1s ease forwards;
+}
+@keyframes fadeZoom {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Fade & Slide Up */
+[data-animate="fade-slide-up"] {
+  transform: translateY(30px);
+  animation: fadeSlideUp 1s ease forwards;
+}
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0; 
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+/* Stagger Delays (0.2s increments) */
+[data-delay] {
+  animation-delay: var(--delay, 0s);
+}
+[data-delay="0.2s"] { --delay: 0.2s; }
+[data-delay="0.4s"] { --delay: 0.4s; }
+[data-delay="0.6s"] { --delay: 0.6s; }
+[data-delay="0.8s"] { --delay: 0.8s; }
+[data-delay="1.0s"] { --delay: 1.0s; }
+[data-delay="1.2s"] { --delay: 1.2s; }
+[data-delay="1.4s"] { --delay: 1.4s; }
+[data-delay="1.6s"] { --delay: 1.6s; }
