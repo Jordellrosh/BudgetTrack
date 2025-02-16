@@ -15,13 +15,16 @@ app.get("/", (req, res) => {
 app.get("/routes", (req, res) => {
   res.json(app._router.stack
     .filter(r => r.route) // Filters middleware, keeps routes
-    .map(r => r.route.path) // Extracts available paths
+    .map(r => ({
+      path: r.route.path,
+      method: Object.keys(r.route.methods)[0].toUpperCase()
+    })) // Extracts method and path
   );
 });
 
 // Import transaction routes
-const transactionRoutes = require("./routes/transactions");
-app.use("/transactions", transactionRoutes);
+const transactionRoutes = require("./routes/transactions"); // Ensure correct path
+app.use("/transactions", transactionRoutes); // Correct mount path
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
