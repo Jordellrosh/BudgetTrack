@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BudgetTrack - Accounts (Simplified Wave Hero)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Chart.js for charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+
+  <style>
+    /************************************************
+     **           ROOT VARIABLES & GLOBAL
+    ************************************************/
+    :root {
+      /* Light Mode Variables */
+      --primary-color: #3e3a7d;     
+      --secondary-color: #6a5acd;   
+      --bg-gradient: linear-gradient(135deg, #d4c3ff, #f6f4ff);
+      --text-color: #333;          
+      --text-light: #fff;          
+      --shadow-light: rgba(0, 0, 0, 0.1);
+      --glass-bg: rgba(255, 255, 255, 0.15);
+      --glass-border: rgba(255, 255, 255, 0.25);
+
+      /* Wave color in light mode */
+      --wave-color: #f6f4ff;
+
+      /* Stats & Chart sizes, transitions */
+      --circle-size: 130px;
+      --chart-width: 380px;
+      --chart-height: 300px;
+      --transition-speed: 0.3s;
+      --max-content-width: 1200px;
+    }
+
+    /* Dark Mode Overrides */
+    body.dark-mode {
+      --text-color: #ccc;
+      --primary-color: #1f1b3b;
+      --secondary-color: #4a4380;
+      --bg-gradient: linear-gradient(135deg, #2b2751, #3c3873);
+      --glass-bg: rgba(255, 255, 255, 0.07);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --shadow-light: rgba(255, 255, 255, 0.05);
+      --wave-color: #2b2751; /* wave in dark mode */
+    }
+
+    /* Global Reset & Font */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Nunito", sans-serif;
+    }
+    body {
+      display: flex;
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      color: var(--text-color);
+      overflow-x: hidden;
+      transition: background var(--transition-speed), color var(--transition-speed);
+    }
+
+    /************************************************
+     **           SIDEBAR
+    ************************************************/
+    .sidebar {
+      width: 260px;
+      background: var(--primary-color);
+      color: var(--text-light);
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      top: 0;
+      left: 0;
+      z-index: 10;
+      transition: background var(--transition-speed);
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+    .sidebar ul {
+      list-style: none;
+    }
+    .sidebar ul li {
+      margin-bottom: 15px;
+    }
+    .sidebar ul li a {
+      color: var(--text-light);
+      text-decoration: none;
+      display: block;
+      padding: 10px;
+      border-radius: 5px;
+      transition: background var(--transition-speed);
+    }
+    .sidebar ul li a:hover,
+    .sidebar ul li a.active {
+      background: var(--secondary-color);
+    }
+
+    /************************************************
+     **           DARK MODE TOGGLE
+    ************************************************/
+    .dark-mode-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--primary-color);
+      color: var(--text-light);
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 100;
+      transition: background var(--transition-speed);
+    }
+    .dark-mode-toggle:hover {
+      background: var(--secondary-color);
+    }
+
+    /************************************************
+     **           MAIN CONTENT
+    ************************************************/
+    .content {
+      margin-left: 260px;
+      flex: 1;
+      padding: 30px;
+      max-width: var(--max-content-width);
+      margin: 0 auto;
+      position: relative;
+      transition: margin-left var(--transition-speed);
+    }
+
+    /************************************************
+     **           HERO (Wave at bottom)
+    ************************************************/
+    .hero {
+      position: relative;
+      background: var(--primary-color);
+      color: var(--text-light);
+      padding: 50px 20px 80px;
+      text-align: center;
+      margin-bottom: 40px;
+      box-shadow: 0 8px 20px var(--shadow-light);
+      overflow: hidden;
+      transition: background var(--transition-speed);
+    }
+    .hero h1 {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .hero p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+    .wave-shape {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 80px; /* smaller wave height */
+      overflow: hidden;
+      z-index: 1;
+    }
+    .wave-shape svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .wave-shape path {
+      fill: var(--wave-color);
+      transition: fill var(--transition-speed);
+    }
+
+    /************************************************
+     **           STATS (Circle-Style)
+    ************************************************/
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+    .circle-stat {
+      width: var(--circle-size);
+      height: var(--circle-size);
+      border-radius: 50%;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 4px 8px var(--shadow-light);
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: transform var(--transition-speed);
+    }
+    .circle-stat:hover {
+      transform: scale(1.05);
+    }
+    .circle-stat h3 {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 3px;
+    }
+    .circle-stat p {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--text-color);
+    }
+
+    /************************************************
+     **           ACCOUNTS & ADD FORM
+    ************************************************/
+    .accounts-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      justify-content: center;
+      align-items: flex-start;
+      margin-bottom: 30px;
+    }
+
+    .account-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      flex: 2;
+    }
+    .account-card {
+      backdrop-filter: blur(10px);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 3px 5px var(--shadow-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: transform var(--transition-speed);
+      position: relative;
+      animation: fadeInUp 0.4s ease;
+    }
+    .account-card:hover {
+      transform: scale(1.02);
+    }
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .account-info {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .account-info h3 {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--text-color);
+    }
+    .account-info p {
+      font-size: 14px;
+      color: #555;
+    }
+    .account-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-edit,
+    .btn-delete {
+      background: var(--primary-color);
+      color: var(--text-light);
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background var(--transition-speed);
+    }
+    .btn-delete {
+      background: red;
+    }
+    .btn-edit:hover {
+      background: var(--secondary-color);
+    }
+    .btn-delete:hover {
+      background: #ff4444;
+    }
+
+    .add-account-container {
+      backdrop-filter: blur(10px);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 3px 5px var(--shadow-light);
+      max-width: 400px;
+      flex: 1;
+      transition: background var(--transition-speed);
+    }
+    .add-account-container h2 {
+      text-align: center;
+      margin-bottom: 15px;
+      color: var(--text-color);
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      font-size: 14px;
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+    }
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .btn-add {
+      background: var(--primary-color);
+      color: var(--text-light);
+      border: none;
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background var(--transition-speed);
+    }
+    .btn-add:hover {
+      background: var(--secondary-color);
+    }
+
+    /************************************************
+     **           CHARTS
+    ************************************************/
+    .charts-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      justify-content: center;
+      margin-bottom: 50px;
+    }
+    .chart-card {
+      backdrop-filter: blur(10px);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      box-shadow: 0 3px 5px var(--shadow-light);
+      padding: 20px;
+      width: var(--chart-width);
+      text-align: center;
+      transition: transform var(--transition-speed);
+    }
+    .chart-card:hover {
+      transform: translateY(-5px);
+    }
+    .chart-card h3 {
+      margin-bottom: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--text-color);
+    }
+    .chart-wrapper {
+      width: 100%;
+      height: var(--chart-height);
+      position: relative;
+    }
+
+    /************************************************
+     **           RESPONSIVE
+    ************************************************/
+    @media (max-width: 768px) {
+      .stats {
+        flex-direction: column;
+        align-items: center;
+      }
+      .account-list {
+        max-width: 100%;
+      }
+      .chart-card {
+        width: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">BudgetTrack</div>
+    <ul>
+      <li><a href="index.html">Dashboard</a></li>
+      <li><a href="transactions.html">Transactions</a></li>
+      <li><a href="accounts.html" class="active">Accounts</a></li>
+      <li><a href="settings.html">Settings</a></li>
+    </ul>
+  </aside>
+
+  <!-- DARK MODE TOGGLE -->
+  <button class="dark-mode-toggle" id="darkModeToggle">Dark Mode</button>
+
+  <!-- MAIN CONTENT -->
+  <main class="content">
+    <!-- HERO with wave shape -->
+    <div class="hero">
+      <h1>Accounts Overview</h1>
+      <p>Manage your balances & net worth in one place—designed for your budgeting goals!</p>
+      <div class="wave-shape">
+        <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+          <path fill="var(--wave-color)" fill-opacity="1"
+            d="M0,224L30,202.7C60,181,120,139,180,133.3C240,128,300,160,360,170.7C420,181,480,171,540,154.7C600,139,660,117,720,122.7C780,128,840,160,900,170.7C960,181,1020,171,1080,160C1140,149,1200,139,1260,128C1320,117,1380,107,1410,101.3L1440,96L1440,320L1410,320C1380,320,1320,320,1260,320C1200,320,1140,320,1080,320C1020,320,960,320,900,320C840,320,780,320,720,320C660,320,600,320,540,320C480,320,420,320,360,320C300,320,240,320,180,320C120,320,60,320,30,320L0,320Z">
+          </path>
+        </svg>
+      </div>
+    </div>
+
+    <!-- STATS (Circle-Style) -->
+    <div class="stats">
+      <div class="circle-stat">
+        <h3>Total</h3>
+        <p id="totalAccounts">0</p>
+      </div>
+      <div class="circle-stat">
+        <h3>Combined</h3>
+        <p id="combinedBalance">$0.00</p>
+      </div>
+      <div class="circle-stat">
+        <h3>Net Worth</h3>
+        <p id="netWorth">$0.00</p>
+      </div>
+    </div>
+
+    <!-- ACCOUNTS + ADD FORM -->
+    <div class="accounts-section">
+      <!-- Account List -->
+      <div class="account-list" id="accountList"></div>
+
+      <!-- Add Account Form -->
+      <div class="add-account-container">
+        <h2>Add New Account</h2>
+        <form id="accountForm">
+          <div class="form-group">
+            <label for="accountName">Account Name:</label>
+            <input type="text" id="accountName" required />
+          </div>
+          <div class="form-group">
+            <label for="accountType">Account Type:</label>
+            <select id="accountType">
+              <option>Checking</option>
+              <option>Savings</option>
+              <option>Credit Card</option>
+              <option>Loan</option>
+              <option>Investment</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="initialBalance">Initial Balance:</label>
+            <input type="number" id="initialBalance" placeholder="0.00" required />
+          </div>
+          <button type="submit" class="btn-add">Add Account</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- CHARTS SECTION -->
+    <div class="charts-section">
+      <div class="chart-card">
+        <h3>Distribution of Balances</h3>
+        <div class="chart-wrapper">
+          <canvas id="balanceDoughnut"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3>Net Worth Over Time</h3>
+        <div class="chart-wrapper">
+          <canvas id="netWorthLine"></canvas>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      /**********************************************
+       *        DARK MODE TOGGLE
+       **********************************************/
+      const darkModeToggle = document.getElementById("darkModeToggle");
+      if (localStorage.getItem("darkMode") === "true") {
+        document.body.classList.add("dark-mode");
+        darkModeToggle.textContent = "Light Mode";
+      }
+      darkModeToggle.addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+        const isDark = document.body.classList.contains("dark-mode");
+        localStorage.setItem("darkMode", isDark);
+        darkModeToggle.textContent = isDark ? "Light Mode" : "Dark Mode";
+      });
+
+      /**********************************************
+       *        DOM Elements & Placeholder Accounts
+       **********************************************/
+      const accountForm = document.getElementById("accountForm");
+      const accountList = document.getElementById("accountList");
+      const totalAccountsEl = document.getElementById("totalAccounts");
+      const combinedBalanceEl = document.getElementById("combinedBalance");
+      const netWorthEl = document.getElementById("netWorth");
+
+      // Some placeholder accounts
+      let accounts = [
+        { name: "Placeholder1", type: "Checking", balance: 2500 },
+        { name: "Placeholder2", type: "Savings", balance: 6000 },
+        { name: "Placeholder3", type: "Credit Card", balance: -1200 }
+      ];
+      let netWorthHistory = [];
+
+      // Chart contexts
+      const doughnutCtx = document.getElementById("balanceDoughnut").getContext("2d");
+      const lineCtx = document.getElementById("netWorthLine").getContext("2d");
+
+      // Initialize Charts
+      let doughnutChart = new Chart(doughnutCtx, {
+        type: "doughnut",
+        data: {
+          labels: [],
+          datasets: [{
+            data: [],
+            backgroundColor: ["#FF6384","#36A2EB","#FFCE56","#4BC0C0","#9966FF","#FF9F40"],
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let label = context.label || "";
+                  let value = context.parsed || 0;
+                  return label + ": $" + value;
+                }
+              }
+            }
+          }
+        }
+      });
+
+      let lineChart = new Chart(lineCtx, {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [{
+            label: "Net Worth",
+            data: [],
+            borderColor: "#3e3a7d",
+            fill: true,
+            backgroundColor: createGradient(lineCtx),
+            tension: 0.1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let value = context.parsed.y || 0;
+                  return "Net Worth: $" + value;
+                }
+              }
+            }
+          }
+        }
+      });
+
+      function createGradient(ctx) {
+        let gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, "rgba(62,58,125,0.4)");
+        gradient.addColorStop(1, "rgba(62,58,125,0)");
+        return gradient;
+      }
+
+      /**********************************************
+       *        FORM SUBMISSION
+       **********************************************/
+      accountForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("accountName").value.trim();
+        const type = document.getElementById("accountType").value;
+        const balance = parseFloat(document.getElementById("initialBalance").value) || 0;
+
+        accounts.push({ name, type, balance });
+        accountForm.reset();
+        updateUI();
+      });
+
+      /**********************************************
+       *        UPDATE UI
+       **********************************************/
+      function updateUI() {
+        // Clear existing
+        accountList.innerHTML = "";
+
+        // Update Stats
+        totalAccountsEl.textContent = accounts.length;
+        const totalBalance = accounts.reduce((sum, a) => sum + a.balance, 0);
+        combinedBalanceEl.textContent = `$${totalBalance.toFixed(2)}`;
+        netWorthEl.textContent = `$${totalBalance.toFixed(2)}`;
+
+        // Render accounts
+        accounts.forEach((acc, index) => {
+          const card = document.createElement("div");
+          card.classList.add("account-card");
+          card.innerHTML = `
+            <div class="account-info" style="border-left: 5px solid ${colorForType(acc.type)}; padding-left:10px;">
+              <h3>${acc.name} (${acc.type})</h3>
+              <p>Balance: $${acc.balance.toFixed(2)}</p>
+            </div>
+            <div class="account-buttons">
+              <button class="btn-edit" data-index="${index}">Edit</button>
+              <button class="btn-delete" data-index="${index}">Delete</button>
+            </div>
+          `;
+          accountList.appendChild(card);
+
+          // Expandable placeholder transaction list
+          const detailsDiv = document.createElement("div");
+          detailsDiv.style.display = "none";
+          detailsDiv.style.marginTop = "10px";
+          detailsDiv.innerHTML = `
+            <p style="font-size:14px; color:#555;">Transactions (Placeholder):</p>
+            <ul style="font-size:14px; color:#555;">
+              <li>+ $100 (Deposit)</li>
+              <li>- $40 (Groceries)</li>
+              <li>- $15 (Streaming)</li>
+            </ul>
+          `;
+          card.appendChild(detailsDiv);
+
+          // Toggle details on card click if not edit/delete
+          card.addEventListener("click", (ev) => {
+            if (ev.target.classList.contains("btn-edit") || ev.target.classList.contains("btn-delete")) return;
+            detailsDiv.style.display = (detailsDiv.style.display === "none") ? "block" : "none";
+          });
+        });
+
+        // Update charts
+        updateCharts();
+        attachButtons();
+      }
+
+      function attachButtons() {
+        const editBtns = document.querySelectorAll(".btn-edit");
+        const deleteBtns = document.querySelectorAll(".btn-delete");
+
+        editBtns.forEach(btn => btn.addEventListener("click", handleEdit));
+        deleteBtns.forEach(btn => btn.addEventListener("click", handleDelete));
+      }
+
+      function handleEdit(e) {
+        e.stopPropagation();
+        const idx = e.target.dataset.index;
+        const acc = accounts[idx];
+        const newName = prompt("Edit Account Name:", acc.name);
+        if (newName !== null && newName.trim() !== "") {
+          acc.name = newName.trim();
+        }
+        const newBalanceStr = prompt("Edit Balance:", acc.balance);
+        if (newBalanceStr !== null && !isNaN(parseFloat(newBalanceStr))) {
+          acc.balance = parseFloat(newBalanceStr);
+        }
+        updateUI();
+      }
+
+      function handleDelete(e) {
+        e.stopPropagation();
+        const idx = e.target.dataset.index;
+        accounts.splice(idx, 1);
+        updateUI();
+      }
+
+      function colorForType(type) {
+        switch(type.toLowerCase()) {
+          case "checking": return "#36A2EB";
+          case "savings": return "#4BC0C0";
+          case "credit card": return "#FF6384";
+          case "loan": return "#FF9F40";
+          case "investment": return "#9966FF";
+          default: return "#aaa";
+        }
+      }
+
+      function updateCharts() {
+        // Doughnut
+        doughnutChart.data.labels = accounts.map(a => `${a.name} (${a.type})`);
+        doughnutChart.data.datasets[0].data = accounts.map(a => a.balance);
+        doughnutChart.update();
+
+        // Net worth line
+        const totalBalance = accounts.reduce((sum, a) => sum + a.balance, 0);
+        const time = new Date().toLocaleTimeString();
+        netWorthHistory.push({ time, value: totalBalance });
+
+        lineChart.data.labels = netWorthHistory.map(i => i.time);
+        lineChart.data.datasets[0].data = netWorthHistory.map(i => i.value);
+        lineChart.update();
+      }
+
+      // INITIAL RENDER
+      updateUI();
+    });
+  </script>
+</body>
+</html>

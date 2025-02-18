@@ -2,14 +2,9 @@
    1. ROOT VARIABLES
 ============================== */
 :root {
-  /* Background gradient for the main page */
   --bg-gradient: linear-gradient(145deg, #ede7ff, #f6f4ff);
-  
-  /* Accent colors (pastels) */
   --accent1: #7f77ff; /* lavender/purple */
   --accent2: #b8b2ff; /* lighter lavender */
-  
-  /* Text colors */
   --text-color: #333;
 
   /* Alerts */
@@ -85,12 +80,12 @@ a {
 }
 
 /* ==============================
-   5. HERO SECTION
+   5. DASHBOARD HERO (for index/dashboard)
 ============================== */
 .hero {
   position: relative;
-  background: linear-gradient(160deg, var(--accent1) 0%, var(--accent2) 100%);
-  height: 420px;
+  background: linear-gradient(160deg, var(--accent1), var(--accent2));
+  height: 320px; /* can adjust if you'd like a taller hero */
   border-bottom-left-radius: 60px;
   border-bottom-right-radius: 60px;
   display: flex;
@@ -99,11 +94,6 @@ a {
   text-align: center;
   padding: 40px 20px;
   color: #fff;
-}
-.hero-graphics {
-  /* Optional: place an illustration or shapes in background
-     e.g. background: url('assets/illustration.svg') no-repeat center/contain; 
-  */
 }
 .hero-inner {
   max-width: 700px;
@@ -124,7 +114,7 @@ a {
 ============================== */
 .dashboard {
   max-width: 1200px;
-  margin: -70px auto 40px; /* overlaps hero */
+  margin: -70px auto 40px;
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
@@ -159,7 +149,7 @@ a {
   width: 140px;
   height: 140px;
   border-radius: 50%;
-  /* Example gradient: 60% spent, 40% saved */
+  /* Example gradient for pie chart: 60% spent, 40% saved */
   background: conic-gradient(#ff9f9f 0% 60%, #b8b2ff 60% 100%);
   display: flex;
   justify-content: center;
@@ -256,7 +246,7 @@ a {
 }
 
 /* ==============================
-   7. SUMMARY CIRCLES
+   7. SUMMARY CIRCLES (Dashboard)
 ============================== */
 .summary {
   display: flex;
@@ -295,7 +285,7 @@ a {
 }
 
 /* ==============================
-   8. TRANSACTION FORM
+   8. TRANSACTION FORM (Dashboard or global)
 ============================== */
 .transaction-form {
   max-width: 800px;
@@ -344,7 +334,7 @@ a {
 }
 
 /* ==============================
-   9. TRANSACTIONS LIST
+   9. TRANSACTIONS LIST (Dashboard or global)
 ============================== */
 .transactions {
   max-width: 800px;
@@ -404,28 +394,23 @@ footer {
 /* ==============================
    12. ANIMATIONS
 ============================== */
-/* Hide elements if they have data-animate. They fade in on load. */
 [data-animate] {
   opacity: 0;
 }
-
-/* Fade & Slide Down */
 [data-animate="fade-slide-down"] {
   transform: translateY(-30px);
   animation: fadeSlideDown 1s ease forwards;
 }
 @keyframes fadeSlideDown {
   0% {
-    opacity: 0; 
+    opacity: 0;
     transform: translateY(-30px);
   }
   100% {
-    opacity: 1; 
+    opacity: 1;
     transform: translateY(0);
   }
 }
-
-/* Fade & Zoom */
 [data-animate="fade-zoom"] {
   transform: scale(0.9);
   animation: fadeZoom 1s ease forwards;
@@ -440,24 +425,20 @@ footer {
     transform: scale(1);
   }
 }
-
-/* Fade & Slide Up */
 [data-animate="fade-slide-up"] {
   transform: translateY(30px);
   animation: fadeSlideUp 1s ease forwards;
 }
 @keyframes fadeSlideUp {
   0% {
-    opacity: 0; 
+    opacity: 0;
     transform: translateY(30px);
   }
   100% {
-    opacity: 1; 
+    opacity: 1;
     transform: translateY(0);
   }
 }
-
-/* Stagger Delays (0.2s increments) */
 [data-delay] {
   animation-delay: var(--delay, 0s);
 }
@@ -469,3 +450,236 @@ footer {
 [data-delay="1.2s"] { --delay: 1.2s; }
 [data-delay="1.4s"] { --delay: 1.4s; }
 [data-delay="1.6s"] { --delay: 1.6s; }
+
+/* ==============================
+   13. ACCOUNTS PAGE FIXES
+============================== */
+
+/* --- HERO SECTION FIXES --- */
+.accounts-hero {
+  position: relative;
+  background: linear-gradient(160deg, var(--accent1), var(--accent2));
+  color: #fff;
+  padding: 80px 20px 40px;
+  text-align: center;
+  overflow: hidden;
+  border-bottom-left-radius: 60px;
+  border-bottom-right-radius: 60px;
+  margin-bottom: 50px;
+  height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.accounts-hero h1 {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+}
+.accounts-hero p {
+  font-size: 18px;
+  opacity: 0.9;
+}
+.wave-shape {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  overflow: hidden;
+}
+.wave-shape svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* --- STATS SECTION FIXES --- */
+.accounts-stats {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.stat-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  text-align: center;
+  flex: 1 1 200px;
+  max-width: 250px;
+  transition: transform 0.2s ease;
+}
+.stat-card:hover {
+  transform: scale(1.05);
+}
+.stat-card h3 {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 8px;
+}
+.stat-card p {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+}
+
+/* --- FLEX LAYOUT FIXES --- */
+.accounts-flex {
+  max-width: 1100px;
+  margin: 0 auto 60px;
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.accounts-left {
+  flex: 1 1 500px;
+}
+.accounts-right {
+  flex: 1 1 350px;
+}
+.accounts-left h2,
+.accounts-right h2 {
+  margin-bottom: 15px;
+  font-size: 22px;
+}
+
+/* --- ACCOUNT CARDS FIXES --- */
+.accounts-wrapper {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  position: relative;
+}
+.account-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+  padding: 20px;
+  width: 280px;
+  height: auto;
+  transition: transform 0.2s ease;
+}
+.account-card:hover {
+  transform: translateY(-3px);
+}
+.account-card h3 {
+  margin-bottom: 8px;
+  font-size: 18px;
+  color: #333;
+}
+.account-card p span {
+  font-weight: 600;
+}
+
+/* --- ACCOUNT NAVIGATION BUTTONS (Carousel) --- */
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--accent1);
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background 0.3s ease;
+}
+.carousel-btn:hover {
+  background: var(--accent2);
+}
+.prev {
+  left: -50px;
+}
+.next {
+  right: -50px;
+}
+
+/* --- ADD ACCOUNT FORM FIXES --- */
+.add-account-form {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+  padding: 20px;
+  max-width: 400px;
+}
+.add-account-form h2 {
+  margin-bottom: 15px;
+  font-size: 20px;
+  color: #444;
+}
+.form-group {
+  margin-bottom: 15px;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #555;
+  font-size: 14px;
+}
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #484399;
+}
+.add-account-form button {
+  background: var(--accent1);
+  color: #fff;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 10px;
+  transition: background 0.3s ease;
+}
+.add-account-form button:hover {
+  background: var(--accent2);
+}
+
+/* --- AUTO-SAVE FEATURE BLOCK --- */
+.feature-block {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* --- RESPONSIVENESS FIXES --- */
+@media (max-width: 900px) {
+  .accounts-flex {
+    flex-direction: column;
+    align-items: center;
+  }
+  .accounts-wrapper {
+    flex-direction: column;
+  }
+  .prev, .next {
+    display: none;
+  }
+}
