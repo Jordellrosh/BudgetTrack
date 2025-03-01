@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BudgetTrack - Register</title>
+  <link rel="stylesheet" href="register.css" />
+</head>
+<body>
+
+  <!-- DARK MODE TOGGLE (top-right corner) -->
+  <div class="top-right-controls">
+    <button id="darkModeToggle" title="Toggle Dark Mode">Dark Mode</button>
+  </div>
+
+  <div class="container">
+    
+    <!-- LEFT PANEL => abstract shapes + bigger branding text -->
+    <div class="left-panel">
+      <div class="shapes">
+        <!-- Three shapes: circle, blob, large circle -->
+        <div class="shape shape1"></div>
+        <div class="shape shape2"></div>
+        <div class="shape shape3"></div>
+      </div>
+
+      <div class="branding animated-left">
+        <h1>BudgetTrack</h1>
+        <p>Experience your finances with a modern, vibrant twist.</p>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL => subtle gradient background, full side -->
+    <div class="right-panel">
+      <!-- Soft divider/shadow is handled in CSS -->
+      <div class="form-content animated-right">
+        <!-- Short headline above "Create Account" -->
+        <h2 class="pre-heading">Ready to take control of your finances?</h2>
+        <h3>Create Account</h3>
+        <p class="subtitle">Join us for a colorful approach to budgeting!</p>
+        
+        <form id="registerForm">
+          <label for="userName">User Name</label>
+          <input type="text" id="userName" placeholder="Choose a user name" required />
+
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="Your Email" required />
+
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Your Password" required />
+
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" placeholder="Retype Password" required />
+
+          <button type="submit">Register</button>
+
+          <!-- Error message placeholder -->
+          <div id="registerError" class="error-message" style="display:none;"></div>
+        </form>
+
+        <p class="switch-page">
+          Already have an account?
+          <a href="login.html">Log In Here</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER at the bottom -->
+  <footer>
+    <p>BudgetTrack • Version 0.1 (Early Access)</p>
+  </footer>
+
+  <script src="register.js" defer></script>
+</body>
+</html>

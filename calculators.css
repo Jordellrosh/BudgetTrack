@@ -1,0 +1,151 @@
+/* calculators.css */
+
+/* CONTAINER FOR ALL CALCULATORS */
+.calculators-container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* TABS => row of buttons */
+  .calc-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .calc-tab {
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s, transform 0.3s;
+  }
+  .calc-tab:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.05);
+  }
+  .calc-tab.active {
+    background: #6a5acd;
+    color: #fff;
+  }
+  
+  /* CONTENT FOR EACH TAB => card-like style */
+  .calc-content {
+    display: none; /* only the active tab is shown */
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    transition: background 0.3s;
+  }
+  .calc-content.active {
+    display: block;
+  }
+  
+  /* HEADINGS & PARAGRAPHS */
+  .calc-content h2 {
+    font-size: 20px;
+    margin-bottom: 8px;
+    color: #444;
+  }
+  .calc-content p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 15px;
+  }
+  
+  /* INPUT FIELDS & LABELS */
+  .calc-content label {
+    display: block;
+    margin: 8px 0 4px;
+    font-size: 14px;
+    color: #444;
+  }
+  .calc-content input[type="number"],
+  .calc-content input[type="text"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  /* BUTTONS => calculate */
+  .calc-content button {
+    background: #6a5acd;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.3s, transform 0.3s;
+  }
+  .calc-content button:hover {
+    background: #5843b9;
+    transform: scale(1.03);
+  }
+  
+  /* BASIC CALCULATOR WRAPPER */
+  .basic-calc-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 300px;
+  }
+  #basicCalcDisplay {
+    padding: 10px;
+    font-size: 18px;
+    text-align: right;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #fff;
+  }
+  .basic-calc-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  
+  /* CAR LOAN, MORTGAGE, INSURANCE, SAVINGS => fields grouped */
+  .car-loan-fields,
+  .mortgage-fields,
+  .insurance-fields,
+  .savings-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  /* RESULTS => highlight or bold? */
+  .car-loan-result p,
+  .mortgage-result p,
+  .insurance-result p,
+  .savings-result p {
+    margin: 6px 0;
+    font-weight: 600;
+  }
+  
+  /* INSURANCE => sub-fields toggled by JS */
+  .sub-fields {
+    margin-left: 20px;
+  }
+  
+  /* RESPONSIVE => stack if needed */
+  @media (max-width: 992px) {
+    .calc-tabs {
+      flex-wrap: wrap;
+    }
+    .basic-calc-wrapper {
+      max-width: 100%;
+    }
+  }
+  

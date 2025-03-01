@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BudgetTrack - Login</title>
+  <!-- Link to the external CSS file -->
+  <link rel="stylesheet" href="login.css" />
+</head>
+<body>
+
+  <!-- DARK MODE TOGGLE (top-right corner) -->
+  <div class="top-right-controls">
+    <button id="darkModeToggle" title="Toggle Dark Mode">Dark Mode</button>
+  </div>
+
+  <div class="container">
+    
+    <!-- LEFT PANEL => same abstract shapes + branding -->
+    <div class="left-panel">
+      <div class="shapes">
+        <div class="shape shape1"></div>
+        <div class="shape shape2"></div>
+        <div class="shape shape3"></div>
+      </div>
+
+      <div class="branding animated-left">
+        <h1>BudgetTrack</h1>
+        <p>Experience your finances with a modern, vibrant twist.</p>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL => subtle lavender gradient + login form -->
+    <div class="right-panel">
+      <div class="form-content animated-right">
+        <!-- Short headline above "Log In" -->
+        <h2 class="pre-heading">Welcome back to BudgetTrack</h2>
+        <h3>Log In</h3>
+        <p class="subtitle">Enter your credentials to continue.</p>
+        
+        <form id="loginForm">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="Your Email" required />
+
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Your Password" required />
+
+          <!-- Optional "Forgot Password?" link -->
+          <div class="forgot-password">
+            <a href="#">Forgot Password?</a>
+          </div>
+
+          <button type="submit">Log In</button>
+
+          <!-- Error message placeholder -->
+          <div id="loginError" class="error-message" style="display:none;"></div>
+        </form>
+
+        <p class="switch-page">
+          Don’t have an account?
+          <a href="register.html">Register Here</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>BudgetTrack • Version 0.1 (Early Access)</p>
+  </footer>
+
+  <script src="login.js" defer></script>
+</body>
+</html>

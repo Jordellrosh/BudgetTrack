@@ -1,0 +1,125 @@
+/* ================================
+   transactions.css (Page-Specific)
+================================ */
+
+/* 1) Override negative margin from global .dashboard-layout if any */
+.transactions-page.dashboard-layout {
+    margin-top: 0 !important;
+  }
+  
+  /* 2) Extra animations for wave or hero are presumably in your global.
+     We’ll add more “wow” factor to the cards, table, row insert, etc. */
+  
+  /* Glow on hover for the .card => .glow-on-hover */
+  .glow-on-hover {
+    transition: box-shadow 0.4s;
+  }
+  .glow-on-hover:hover {
+    box-shadow: 0 0 30px rgba(255,255,255,0.4), 0 0 10px rgba(100,200,255,0.2) inset;
+    transform: translateY(-5px) scale(1.02);
+  }
+  
+  /* 3) Table styling => advanced transactions table */
+  .transactions-page table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+  }
+  .transactions-page table thead {
+    background: rgba(255,255,255,0.3);
+  }
+  .transactions-page table th, 
+  .transactions-page table td {
+    padding: 12px;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    transition: background 0.3s;
+  }
+  .transactions-page table tr:last-child td {
+    border-bottom: none;
+  }
+  .transactions-page table tbody tr:hover {
+    background: rgba(255,255,255,0.1);
+  }
+  
+  /* 4) Animate newly inserted rows => fadeInUp style */
+  @keyframes newRowFadeUp {
+    0% {
+      opacity: 0;
+      transform: translateY(15px);
+      background: rgba(255,255,0,0.2);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+      background: transparent;
+    }
+  }
+  .new-row {
+    animation: newRowFadeUp 0.8s ease forwards;
+  }
+  
+  /* 5) Inline editing highlight on hover */
+  .editable:hover {
+    background: rgba(255,255,255,0.3) !important;
+    cursor: pointer;
+  }
+  
+  /* 6) Filters, batch actions, recurring placeholders, CSV import/export */
+  .transactions-page .tx-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  .transactions-page .batch-actions,
+  .transactions-page .recurring-scheduled,
+  .transactions-page .csv-import-export {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+  }
+  
+  /* 7) Recurring & scheduled lists */
+  #recurringList, #scheduledList {
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+  }
+  #recurringList li, #scheduledList li {
+    margin-bottom: 5px;
+  }
+  
+  /* 8) Attachments & notes buttons => match global card style */
+  #attachReceiptBtn, #addNotesBtn {
+    margin-top: 10px;
+    background: #5c4bc8;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  #attachReceiptBtn:hover, #addNotesBtn:hover {
+    background: #4636b2;
+  }
+  
+  /* 9) Category Overview chart styling => you can add more “wow” factor */
+  #categoryOverviewChart {
+    width: 100%;
+    height: 200px;
+    display: block;
+  }
+  #categoryOverviewLegend {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 14px;
+  }
+  
+  /* 10) Additional fade/zoom animations are presumably in your global 
+     for [data-animate="fade-slide-up"], [data-animate="fade-zoom"], etc. */
+  
