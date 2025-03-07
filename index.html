@@ -28,7 +28,7 @@
         <!-- CHANGED this to link "calculators.html" -->
         <li><a href="calculators.html">Calculators</a></li>
         <li><a href="#">Goals</a></li>
-        <!-- Already linking to "settings.html" -->
+        <li><a href="budget.html">Budget</a></li>
         <li><a href="settings.html">Settings</a></li>
         <li><a href="#">Log out</a></li>
       </ul>
@@ -279,5 +279,12 @@
   <!-- CHART.JS & CUSTOM SCRIPT (defer) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="script.js" defer></script>
+
+  <script>
+    const supabaseUrl = 'https://gwtgobknjyujlfolrxol.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3dGdvYmtuanl1amxmb2xyeG9sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk2NDUwODIsImV4cCI6MjA1NTIyMTA4Mn0.WT4tTrd80naSunJ7B2Hi8-3pDUbU4klaEM4YLJhcyOY';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  </script>
+
 </body>
 </html>

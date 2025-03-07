@@ -1,2 +1,0 @@
-# BudgetTrack
-A budgeting app

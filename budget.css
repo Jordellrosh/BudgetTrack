@@ -1,0 +1,251 @@
+/* budget.css - Simplified Advanced */
+
+/* Container around the budget content */
+.budget-container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  /* Top row => wizard + date range */
+  .budget-top-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .wizard-btn {
+    background: #6a5acd;
+    color: #fff;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  .wizard-btn:hover {
+    background: #5542b5;
+  }
+  .date-range {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .date-range select {
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  
+  /* MAIN GRID => category list + bar chart */
+  .budget-main-advanced {
+    display: flex;
+    gap: 20px;
+  }
+  
+  /* Category list => left side */
+  .category-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  /* Each tile => allocated, spent, remove, etc. */
+  .budget-category-tile {
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(6px);
+    padding: 16px;
+    border-radius: 12px;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+  }
+  .budget-category-tile:hover {
+    transform: scale(1.02);
+  }
+  
+  /* Title row => category + icons */
+  .tile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .tile-header h3 {
+    font-size: 18px;
+    margin: 0;
+  }
+  .tile-icons {
+    display: flex;
+    gap: 10px;
+  }
+  .tile-icons i {
+    cursor: pointer;
+    font-size: 18px;
+    color: #444;
+  }
+  .tile-icons i:hover {
+    color: #222;
+  }
+  
+  /* Stats row => allocated, spent, remaining */
+  .tile-stats {
+    display: flex;
+    gap: 20px;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  .tile-stats div {
+    display: flex;
+    flex-direction: column;
+  }
+  .tile-stats strong {
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  
+  /* Progress bar => highlight if near or over budget */
+  .progress-bar {
+    background: #ddd;
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  .progress-fill {
+    background: #6a5acd;
+    height: 100%;
+    transition: width 0.4s;
+  }
+  .progress-fill.warning {
+    background: #ff9800; /* orange for near limit */
+  }
+  .progress-fill.danger {
+    background: #f44336; /* red for over limit */
+  }
+  
+  /* CHART => single bar chart => fixed height */
+  .chart-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .chart-container {
+    width: 400px;
+    max-width: 100%;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(6px);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .chart-container h3 {
+    margin-bottom: 8px;
+  }
+  .chart-container canvas {
+    width: 100%;
+    height: 280px; /* fixed => no infinite growth */
+  }
+  
+  /* MODALS => Wizard + Add/Edit */
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    z-index: 9999;
+  }
+  
+  /* WIZARD */
+  .wizard-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+  }
+  .wizard-step {
+    display: block;
+  }
+  .wizard-step h2 {
+    margin-bottom: 10px;
+  }
+  #wizardCatList, #wizardReviewList {
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    min-height: 80px;
+    margin-bottom: 10px;
+  }
+  #wizardCatList input[type="number"] {
+    width: 80px;
+    margin-left: 6px;
+  }
+  .modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .modal-buttons button {
+    background: #6a5acd;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .modal-buttons button:hover {
+    background: #5542b5;
+  }
+  
+  /* We'll place a "Cancel Wizard" button in top-right, appended by JS */
+  .wizard-content button.cancel-wizard-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #f44336;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  /* ADD/EDIT BUDGET MODAL */
+  .modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .modal-content h2 {
+    margin-bottom: 10px;
+  }
+  .modal-content label {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+  .modal-content input[type="text"],
+  .modal-content input[type="number"],
+  .modal-content select {
+    margin-top: 4px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+  

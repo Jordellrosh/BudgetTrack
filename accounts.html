@@ -1,734 +1,274 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>BudgetTrack - Accounts (Simplified Wave Hero)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BudgetTrack - Accounts</title>
 
-  <!-- Chart.js for charts -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+  <!-- Google Font: Nunito (or your preferred font) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link 
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&display=swap" 
+    rel="stylesheet"
+  />
 
-  <style>
-    /************************************************
-     **           ROOT VARIABLES & GLOBAL
-    ************************************************/
-    :root {
-      /* Light Mode Variables */
-      --primary-color: #3e3a7d;     
-      --secondary-color: #6a5acd;   
-      --bg-gradient: linear-gradient(135deg, #d4c3ff, #f6f4ff);
-      --text-color: #333;          
-      --text-light: #fff;          
-      --shadow-light: rgba(0, 0, 0, 0.1);
-      --glass-bg: rgba(255, 255, 255, 0.15);
-      --glass-border: rgba(255, 255, 255, 0.25);
+  <!-- Global + Page-Specific CSS -->
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="accounts.css" />
 
-      /* Wave color in light mode */
-      --wave-color: #f6f4ff;
+  <!-- (Optional) Font Awesome or brand icons if needed -->
+  <link 
+    rel="stylesheet" 
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    integrity="sha512-lZN37f3+8DNb6PiZbHQZGhC1EopJULz5qIy2q1Q3DUcSiWTINi/Ej/gSSZyI1zBKaQjGLrJ2q0gMTzANv2y8sw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"
+  />
 
-      /* Stats & Chart sizes, transitions */
-      --circle-size: 130px;
-      --chart-width: 380px;
-      --chart-height: 300px;
-      --transition-speed: 0.3s;
-      --max-content-width: 1200px;
-    }
-
-    /* Dark Mode Overrides */
-    body.dark-mode {
-      --text-color: #ccc;
-      --primary-color: #1f1b3b;
-      --secondary-color: #4a4380;
-      --bg-gradient: linear-gradient(135deg, #2b2751, #3c3873);
-      --glass-bg: rgba(255, 255, 255, 0.07);
-      --glass-border: rgba(255, 255, 255, 0.1);
-      --shadow-light: rgba(255, 255, 255, 0.05);
-      --wave-color: #2b2751; /* wave in dark mode */
-    }
-
-    /* Global Reset & Font */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: "Nunito", sans-serif;
-    }
-    body {
-      display: flex;
-      min-height: 100vh;
-      background: var(--bg-gradient);
-      color: var(--text-color);
-      overflow-x: hidden;
-      transition: background var(--transition-speed), color var(--transition-speed);
-    }
-
-    /************************************************
-     **           SIDEBAR
-    ************************************************/
-    .sidebar {
-      width: 260px;
-      background: var(--primary-color);
-      color: var(--text-light);
-      padding: 40px 20px;
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      height: 100vh;
-      top: 0;
-      left: 0;
-      z-index: 10;
-      transition: background var(--transition-speed);
-    }
-    .logo {
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 40px;
-      text-align: center;
-    }
-    .sidebar ul {
-      list-style: none;
-    }
-    .sidebar ul li {
-      margin-bottom: 15px;
-    }
-    .sidebar ul li a {
-      color: var(--text-light);
-      text-decoration: none;
-      display: block;
-      padding: 10px;
-      border-radius: 5px;
-      transition: background var(--transition-speed);
-    }
-    .sidebar ul li a:hover,
-    .sidebar ul li a.active {
-      background: var(--secondary-color);
-    }
-
-    /************************************************
-     **           DARK MODE TOGGLE
-    ************************************************/
-    .dark-mode-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: var(--primary-color);
-      color: var(--text-light);
-      border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      z-index: 100;
-      transition: background var(--transition-speed);
-    }
-    .dark-mode-toggle:hover {
-      background: var(--secondary-color);
-    }
-
-    /************************************************
-     **           MAIN CONTENT
-    ************************************************/
-    .content {
-      margin-left: 260px;
-      flex: 1;
-      padding: 30px;
-      max-width: var(--max-content-width);
-      margin: 0 auto;
-      position: relative;
-      transition: margin-left var(--transition-speed);
-    }
-
-    /************************************************
-     **           HERO (Wave at bottom)
-    ************************************************/
-    .hero {
-      position: relative;
-      background: var(--primary-color);
-      color: var(--text-light);
-      padding: 50px 20px 80px;
-      text-align: center;
-      margin-bottom: 40px;
-      box-shadow: 0 8px 20px var(--shadow-light);
-      overflow: hidden;
-      transition: background var(--transition-speed);
-    }
-    .hero h1 {
-      font-size: 32px;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-    .hero p {
-      font-size: 16px;
-      opacity: 0.9;
-    }
-    .wave-shape {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 80px; /* smaller wave height */
-      overflow: hidden;
-      z-index: 1;
-    }
-    .wave-shape svg {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-    .wave-shape path {
-      fill: var(--wave-color);
-      transition: fill var(--transition-speed);
-    }
-
-    /************************************************
-     **           STATS (Circle-Style)
-    ************************************************/
-    .stats {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-      margin-bottom: 40px;
-    }
-    .circle-stat {
-      width: var(--circle-size);
-      height: var(--circle-size);
-      border-radius: 50%;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      box-shadow: 0 4px 8px var(--shadow-light);
-      backdrop-filter: blur(10px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      transition: transform var(--transition-speed);
-    }
-    .circle-stat:hover {
-      transform: scale(1.05);
-    }
-    .circle-stat h3 {
-      font-size: 14px;
-      color: #555;
-      margin-bottom: 3px;
-    }
-    .circle-stat p {
-      font-size: 18px;
-      font-weight: bold;
-      color: var(--text-color);
-    }
-
-    /************************************************
-     **           ACCOUNTS & ADD FORM
-    ************************************************/
-    .accounts-section {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 30px;
-      justify-content: center;
-      align-items: flex-start;
-      margin-bottom: 30px;
-    }
-
-    .account-list {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      flex: 2;
-    }
-    .account-card {
-      backdrop-filter: blur(10px);
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 3px 5px var(--shadow-light);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: transform var(--transition-speed);
-      position: relative;
-      animation: fadeInUp 0.4s ease;
-    }
-    .account-card:hover {
-      transform: scale(1.02);
-    }
-    @keyframes fadeInUp {
-      0% {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    .account-info {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-    .account-info h3 {
-      font-size: 16px;
-      font-weight: bold;
-      color: var(--text-color);
-    }
-    .account-info p {
-      font-size: 14px;
-      color: #555;
-    }
-    .account-buttons {
-      display: flex;
-      gap: 10px;
-    }
-    .btn-edit,
-    .btn-delete {
-      background: var(--primary-color);
-      color: var(--text-light);
-      border: none;
-      padding: 8px 12px;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background var(--transition-speed);
-    }
-    .btn-delete {
-      background: red;
-    }
-    .btn-edit:hover {
-      background: var(--secondary-color);
-    }
-    .btn-delete:hover {
-      background: #ff4444;
-    }
-
-    .add-account-container {
-      backdrop-filter: blur(10px);
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 3px 5px var(--shadow-light);
-      max-width: 400px;
-      flex: 1;
-      transition: background var(--transition-speed);
-    }
-    .add-account-container h2 {
-      text-align: center;
-      margin-bottom: 15px;
-      color: var(--text-color);
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    .form-group label {
-      font-size: 14px;
-      display: block;
-      margin-bottom: 5px;
-      color: #555;
-    }
-    .form-group input,
-    .form-group select {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    .btn-add {
-      background: var(--primary-color);
-      color: var(--text-light);
-      border: none;
-      width: 100%;
-      padding: 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background var(--transition-speed);
-    }
-    .btn-add:hover {
-      background: var(--secondary-color);
-    }
-
-    /************************************************
-     **           CHARTS
-    ************************************************/
-    .charts-section {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 30px;
-      justify-content: center;
-      margin-bottom: 50px;
-    }
-    .chart-card {
-      backdrop-filter: blur(10px);
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: 10px;
-      box-shadow: 0 3px 5px var(--shadow-light);
-      padding: 20px;
-      width: var(--chart-width);
-      text-align: center;
-      transition: transform var(--transition-speed);
-    }
-    .chart-card:hover {
-      transform: translateY(-5px);
-    }
-    .chart-card h3 {
-      margin-bottom: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      color: var(--text-color);
-    }
-    .chart-wrapper {
-      width: 100%;
-      height: var(--chart-height);
-      position: relative;
-    }
-
-    /************************************************
-     **           RESPONSIVE
-    ************************************************/
-    @media (max-width: 768px) {
-      .stats {
-        flex-direction: column;
-        align-items: center;
-      }
-      .account-list {
-        max-width: 100%;
-      }
-      .chart-card {
-        width: 300px;
-      }
-    }
-  </style>
 </head>
 <body>
+
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="logo">BudgetTrack</div>
-    <ul>
-      <li><a href="index.html">Dashboard</a></li>
-      <li><a href="transactions.html">Transactions</a></li>
-      <li><a href="accounts.html" class="active">Accounts</a></li>
-      <li><a href="settings.html">Settings</a></li>
-    </ul>
+    <nav>
+      <ul>
+        <li><a href="index.html">Dashboard</a></li>
+        <li><a href="transactions.html">Transactions</a></li>
+        <li><a href="accounts.html" class="active">Accounts</a></li>
+        <li><a href="calculators.html">Calculators</a></li>
+        <li><a href="#">Goals</a></li>
+        <li><a href="budget.html">Budget</a></li>
+        <li><a href="settings.html">Settings</a></li>
+        <li><a href="login.html">Log out</a></li>
+      </ul>
+    </nav>
   </aside>
-
-  <!-- DARK MODE TOGGLE -->
-  <button class="dark-mode-toggle" id="darkModeToggle">Dark Mode</button>
 
   <!-- MAIN CONTENT -->
   <main class="content">
-    <!-- HERO with wave shape -->
-    <div class="hero">
-      <h1>Accounts Overview</h1>
-      <p>Manage your balances & net worth in one place—designed for your budgeting goals!</p>
-      <div class="wave-shape">
-        <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
-          <path fill="var(--wave-color)" fill-opacity="1"
-            d="M0,224L30,202.7C60,181,120,139,180,133.3C240,128,300,160,360,170.7C420,181,480,171,540,154.7C600,139,660,117,720,122.7C780,128,840,160,900,170.7C960,181,1020,171,1080,160C1140,149,1200,139,1260,128C1320,117,1380,107,1410,101.3L1440,96L1440,320L1410,320C1380,320,1320,320,1260,320C1200,320,1140,320,1080,320C1020,320,960,320,900,320C840,320,780,320,720,320C660,320,600,320,540,320C480,320,420,320,360,320C300,320,240,320,180,320C120,320,60,320,30,320L0,320Z">
-          </path>
-        </svg>
-      </div>
-    </div>
 
-    <!-- STATS (Circle-Style) -->
-    <div class="stats">
-      <div class="circle-stat">
-        <h3>Total</h3>
-        <p id="totalAccounts">0</p>
-      </div>
-      <div class="circle-stat">
-        <h3>Combined</h3>
-        <p id="combinedBalance">$0.00</p>
-      </div>
-      <div class="circle-stat">
-        <h3>Net Worth</h3>
-        <p id="netWorth">$0.00</p>
-      </div>
-    </div>
-
-    <!-- ACCOUNTS + ADD FORM -->
-    <div class="accounts-section">
-      <!-- Account List -->
-      <div class="account-list" id="accountList"></div>
-
-      <!-- Add Account Form -->
-      <div class="add-account-container">
-        <h2>Add New Account</h2>
-        <form id="accountForm">
-          <div class="form-group">
-            <label for="accountName">Account Name:</label>
-            <input type="text" id="accountName" required />
-          </div>
-          <div class="form-group">
-            <label for="accountType">Account Type:</label>
-            <select id="accountType">
-              <option>Checking</option>
-              <option>Savings</option>
-              <option>Credit Card</option>
-              <option>Loan</option>
-              <option>Investment</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="initialBalance">Initial Balance:</label>
-            <input type="number" id="initialBalance" placeholder="0.00" required />
-          </div>
-          <button type="submit" class="btn-add">Add Account</button>
-        </form>
-      </div>
-    </div>
-
-    <!-- CHARTS SECTION -->
-    <div class="charts-section">
-      <div class="chart-card">
-        <h3>Distribution of Balances</h3>
-        <div class="chart-wrapper">
-          <canvas id="balanceDoughnut"></canvas>
+    <!-- WAVE HERO -->
+    <section class="hero">
+      <div class="hero-waves">
+        <!-- Wave 1 -->
+        <div class="wave wave1">
+          <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path 
+              fill="#8f83ff" 
+              fill-opacity="0.5"
+              d="M0,224L60,197.3C120,171,240,117,360,112C480,107,600,149,720,170.7C840,192,960,192,1080,192C1200,192,1320,192,1380,192L1440,192L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"
+            ></path>
+          </svg>
+        </div>
+        <!-- Wave 2 -->
+        <div class="wave wave2">
+          <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path 
+              fill="#f6f4ff" 
+              fill-opacity="1"
+              d="M0,224L48,213.3C96,203,192,181,288,154.7C384,128,480,96,576,85.3C672,75,768,85,864,117.3C960,149,1056,203,1152,208C1248,213,1344,171,1392,149.3L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+            ></path>
+          </svg>
+        </div>
+        <!-- Wave 3 -->
+        <div class="wave wave3">
+          <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path 
+              fill="#ffffff" 
+              fill-opacity="0.3"
+              d="M0,96L80,128C160,160,320,224,480,224C640,224,800,160,960,128C1120,96,1280,96,1360,96L1440,96L1440,0L1360,0C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0L0,0Z"
+            ></path>
+          </svg>
         </div>
       </div>
-      <div class="chart-card">
-        <h3>Net Worth Over Time</h3>
-        <div class="chart-wrapper">
-          <canvas id="netWorthLine"></canvas>
+      <div class="hero-overlay"></div>
+
+      <!-- HERO CONTENT -->
+      <div class="hero-inner">
+        <h1>Accounts</h1>
+        <p>Manage your various bank, cash, credit, and investment accounts.</p>
+
+        <!-- TOP BAR (search + icons) -->
+        <div class="top-bar">
+          <div class="search-wrapper">
+            <svg class="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" placeholder="Search transactions..." class="search-bar" />
+          </div>
+
+          <!-- NOTIFICATIONS ICON -->
+          <div class="icon icon-bell" id="bellIcon" title="Notifications">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 01-3.46 0"></path>
+            </svg>
+            <span class="badge" id="notificationBadge">0</span>
+          </div>
+          <div class="notifications-dropdown" id="notificationsDropdown" style="display: none;">
+            <div class="notifications-header">
+              <h4>Notifications</h4>
+              <button id="clearNotificationsBtn">Clear All</button>
+            </div>
+            <ul id="notificationsList"></ul>
+          </div>
+
+          <!-- HELP ICON -->
+          <div class="icon icon-help" id="helpIcon" title="Help">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M9.09 9a3 3 0 015.82 0c0 1.66-2 2.24-2 3.25v1"></path>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </div>
+
+          <!-- DARK MODE TOGGLE -->
+          <div class="icon icon-darkmode" id="darkModeToggle" title="Dark Mode Toggle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 3C10.346 3 9 4.346 9 6c0 .251.031.495.09.732A7.501 7.501 0 1017.268 15c.237.59.481.09.732.09 1.654 0 3-1.346 3-3 0-4.962-4.038-9-9-9z"></path>
+            </svg>
+          </div>
+
+          <!-- USER ICON => link to settings.html -->
+          <a href="settings.html" class="icon icon-user" id="userIcon" title="Change User Icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 00-3-3.87"></path>
+              <path d="M4 21v-2a4 4 0 013-3.87"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </a>
         </div>
       </div>
-    </div>
+    </section>
+
+    <!-- ACCOUNTS CONTENT -->
+    <section class="accounts-container">
+      <!-- TABS -->
+      <div class="tabs">
+        <button data-category="All" class="tab active">All</button>
+        <button data-category="Bank" class="tab">Bank</button>
+        <button data-category="Cash" class="tab">Cash</button>
+        <button data-category="Credit" class="tab">Credit</button>
+        <button data-category="Investment" class="tab">Investment</button>
+        <button data-category="Custom" class="tab">Custom</button>
+        <button id="btnAddNew" class="tab add-new">+ Add new</button>
+      </div>
+
+      <!-- "All" => grouped by category -->
+      <div id="allViewContainer"></div>
+
+      <!-- Single category => normal grid -->
+      <div class="accounts-grid" id="accountsGrid"></div>
+    </section>
   </main>
 
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+  <!-- FOOTER -->
+  <footer>
+    <p>BudgetTrack • Version 0.1 (Early Access)</p>
+  </footer>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      /**********************************************
-       *        DARK MODE TOGGLE
-       **********************************************/
-      const darkModeToggle = document.getElementById("darkModeToggle");
-      if (localStorage.getItem("darkMode") === "true") {
-        document.body.classList.add("dark-mode");
-        darkModeToggle.textContent = "Light Mode";
-      }
-      darkModeToggle.addEventListener("click", () => {
-        document.body.classList.toggle("dark-mode");
-        const isDark = document.body.classList.contains("dark-mode");
-        localStorage.setItem("darkMode", isDark);
-        darkModeToggle.textContent = isDark ? "Light Mode" : "Dark Mode";
-      });
+  <!-- HELP OVERLAY -->
+  <div class="help-overlay" id="helpOverlay" style="display: none;">
+    <div class="help-content">
+      <h2>Need Help?</h2>
+      <p>This overlay is controlled by your global script.js. Customize as you wish!</p>
+      <button id="closeHelpBtn">Close</button>
+    </div>
+  </div>
 
-      /**********************************************
-       *        DOM Elements & Placeholder Accounts
-       **********************************************/
-      const accountForm = document.getElementById("accountForm");
-      const accountList = document.getElementById("accountList");
-      const totalAccountsEl = document.getElementById("totalAccounts");
-      const combinedBalanceEl = document.getElementById("combinedBalance");
-      const netWorthEl = document.getElementById("netWorth");
+  <!-- ADD ACCOUNT MODAL -->
+  <div class="modal-overlay" id="addAccountModal" style="display:none;">
+    <div class="modal-content">
+      <h2 id="modalTitle">Add New Account</h2>
+      
+      <label>
+        Name:
+        <input type="text" id="modalAccName" placeholder="e.g. 'CIBC Checking'" />
+      </label>
+      <label>
+        Balance:
+        <input type="number" id="modalAccBalance" placeholder="0" />
+      </label>
+      <label>
+        Currency:
+        <select id="modalAccCurrency">
+          <option value="USD">USD</option>
+          <option value="CAD">CAD</option>
+          <option value="EUR">EUR</option>
+          <option value="JMD">JMD</option>
+        </select>
+      </label>
+      <label>
+        Category:
+        <select id="modalAccCategory">
+          <option value="Bank">Bank</option>
+          <option value="Cash">Cash</option>
+          <option value="Credit">Credit</option>
+          <option value="Investment">Investment</option>
+          <option value="Custom">Custom</option>
+        </select>
+      </label>
+      <label>
+        Last Transaction (optional):
+        <input type="text" id="modalAccLastTx" placeholder="e.g. '+500 deposit'" />
+      </label>
 
-      // Some placeholder accounts
-      let accounts = [
-        { name: "Placeholder1", type: "Checking", balance: 2500 },
-        { name: "Placeholder2", type: "Savings", balance: 6000 },
-        { name: "Placeholder3", type: "Credit Card", balance: -1200 }
-      ];
-      let netWorthHistory = [];
+      <!-- If truly a card-based account (Credit or Debit), fill these in -->
+      <label>
+        Card Type:
+        <select id="modalAccCardType">
+          <option value="">(None)</option>
+          <option value="credit">Credit</option>
+          <option value="debit">Debit</option>
+        </select>
+      </label>
+      <label>
+        Brand:
+        <select id="modalAccBrand">
+          <option value="">(None)</option>
+          <option value="Visa">Visa</option>
+          <option value="Mastercard">Mastercard</option>
+          <option value="Discover">Discover</option>
+          <option value="Other">Other</option>
+        </select>
+      </label>
+      <label>
+        Card Number:
+        <input type="text" id="modalAccNumber" placeholder="**** **** **** 1234" />
+      </label>
+      <label>
+        Expiration (MM/YY):
+        <input type="text" id="modalAccExp" placeholder="12/24" />
+      </label>
+      <label>
+        Cardholder Name:
+        <input type="text" id="modalAccHolder" placeholder="John Doe" />
+      </label>
 
-      // Chart contexts
-      const doughnutCtx = document.getElementById("balanceDoughnut").getContext("2d");
-      const lineCtx = document.getElementById("netWorthLine").getContext("2d");
+      <div class="modal-buttons">
+        <button id="btnSaveAccount">Save</button>
+        <button id="btnCancelAccount">Cancel</button>
+      </div>
+    </div>
+  </div>
 
-      // Initialize Charts
-      let doughnutChart = new Chart(doughnutCtx, {
-        type: "doughnut",
-        data: {
-          labels: [],
-          datasets: [{
-            data: [],
-            backgroundColor: ["#FF6384","#36A2EB","#FFCE56","#4BC0C0","#9966FF","#FF9F40"],
-            hoverOffset: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  let label = context.label || "";
-                  let value = context.parsed || 0;
-                  return label + ": $" + value;
-                }
-              }
-            }
-          }
-        }
-      });
+  <!-- ACCOUNT DETAIL MODAL => appears when user clicks an account -->
+  <div class="modal-overlay" id="accountDetailModal" style="display:none;">
+    <div class="modal-content" id="detailModalContent">
+      <h2>Account Details</h2>
+      <p id="detailAccountInfo"></p>
+      <div class="modal-buttons">
+        <button id="btnEditAccount">Edit</button>
+        <button id="btnDeleteAccount">Delete</button>
+        <button id="closeDetailModal">Close</button>
+      </div>
+    </div>
+  </div>
 
-      let lineChart = new Chart(lineCtx, {
-        type: "line",
-        data: {
-          labels: [],
-          datasets: [{
-            label: "Net Worth",
-            data: [],
-            borderColor: "#3e3a7d",
-            fill: true,
-            backgroundColor: createGradient(lineCtx),
-            tension: 0.1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  let value = context.parsed.y || 0;
-                  return "Net Worth: $" + value;
-                }
-              }
-            }
-          }
-        }
-      });
-
-      function createGradient(ctx) {
-        let gradient = ctx.createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, "rgba(62,58,125,0.4)");
-        gradient.addColorStop(1, "rgba(62,58,125,0)");
-        return gradient;
-      }
-
-      /**********************************************
-       *        FORM SUBMISSION
-       **********************************************/
-      accountForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const name = document.getElementById("accountName").value.trim();
-        const type = document.getElementById("accountType").value;
-        const balance = parseFloat(document.getElementById("initialBalance").value) || 0;
-
-        accounts.push({ name, type, balance });
-        accountForm.reset();
-        updateUI();
-      });
-
-      /**********************************************
-       *        UPDATE UI
-       **********************************************/
-      function updateUI() {
-        // Clear existing
-        accountList.innerHTML = "";
-
-        // Update Stats
-        totalAccountsEl.textContent = accounts.length;
-        const totalBalance = accounts.reduce((sum, a) => sum + a.balance, 0);
-        combinedBalanceEl.textContent = `$${totalBalance.toFixed(2)}`;
-        netWorthEl.textContent = `$${totalBalance.toFixed(2)}`;
-
-        // Render accounts
-        accounts.forEach((acc, index) => {
-          const card = document.createElement("div");
-          card.classList.add("account-card");
-          card.innerHTML = `
-            <div class="account-info" style="border-left: 5px solid ${colorForType(acc.type)}; padding-left:10px;">
-              <h3>${acc.name} (${acc.type})</h3>
-              <p>Balance: $${acc.balance.toFixed(2)}</p>
-            </div>
-            <div class="account-buttons">
-              <button class="btn-edit" data-index="${index}">Edit</button>
-              <button class="btn-delete" data-index="${index}">Delete</button>
-            </div>
-          `;
-          accountList.appendChild(card);
-
-          // Expandable placeholder transaction list
-          const detailsDiv = document.createElement("div");
-          detailsDiv.style.display = "none";
-          detailsDiv.style.marginTop = "10px";
-          detailsDiv.innerHTML = `
-            <p style="font-size:14px; color:#555;">Transactions (Placeholder):</p>
-            <ul style="font-size:14px; color:#555;">
-              <li>+ $100 (Deposit)</li>
-              <li>- $40 (Groceries)</li>
-              <li>- $15 (Streaming)</li>
-            </ul>
-          `;
-          card.appendChild(detailsDiv);
-
-          // Toggle details on card click if not edit/delete
-          card.addEventListener("click", (ev) => {
-            if (ev.target.classList.contains("btn-edit") || ev.target.classList.contains("btn-delete")) return;
-            detailsDiv.style.display = (detailsDiv.style.display === "none") ? "block" : "none";
-          });
-        });
-
-        // Update charts
-        updateCharts();
-        attachButtons();
-      }
-
-      function attachButtons() {
-        const editBtns = document.querySelectorAll(".btn-edit");
-        const deleteBtns = document.querySelectorAll(".btn-delete");
-
-        editBtns.forEach(btn => btn.addEventListener("click", handleEdit));
-        deleteBtns.forEach(btn => btn.addEventListener("click", handleDelete));
-      }
-
-      function handleEdit(e) {
-        e.stopPropagation();
-        const idx = e.target.dataset.index;
-        const acc = accounts[idx];
-        const newName = prompt("Edit Account Name:", acc.name);
-        if (newName !== null && newName.trim() !== "") {
-          acc.name = newName.trim();
-        }
-        const newBalanceStr = prompt("Edit Balance:", acc.balance);
-        if (newBalanceStr !== null && !isNaN(parseFloat(newBalanceStr))) {
-          acc.balance = parseFloat(newBalanceStr);
-        }
-        updateUI();
-      }
-
-      function handleDelete(e) {
-        e.stopPropagation();
-        const idx = e.target.dataset.index;
-        accounts.splice(idx, 1);
-        updateUI();
-      }
-
-      function colorForType(type) {
-        switch(type.toLowerCase()) {
-          case "checking": return "#36A2EB";
-          case "savings": return "#4BC0C0";
-          case "credit card": return "#FF6384";
-          case "loan": return "#FF9F40";
-          case "investment": return "#9966FF";
-          default: return "#aaa";
-        }
-      }
-
-      function updateCharts() {
-        // Doughnut
-        doughnutChart.data.labels = accounts.map(a => `${a.name} (${a.type})`);
-        doughnutChart.data.datasets[0].data = accounts.map(a => a.balance);
-        doughnutChart.update();
-
-        // Net worth line
-        const totalBalance = accounts.reduce((sum, a) => sum + a.balance, 0);
-        const time = new Date().toLocaleTimeString();
-        netWorthHistory.push({ time, value: totalBalance });
-
-        lineChart.data.labels = netWorthHistory.map(i => i.time);
-        lineChart.data.datasets[0].data = netWorthHistory.map(i => i.value);
-        lineChart.update();
-      }
-
-      // INITIAL RENDER
-      updateUI();
-    });
-  </script>
+  <!-- PAGE-SPECIFIC JS -->
+  <script src="accounts.js" defer></script>
+  <!-- GLOBAL SCRIPT (notifications, help, dark mode, etc.) -->
+  <script src="script.js" defer></script>
 </body>
 </html>

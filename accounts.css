@@ -1,0 +1,348 @@
+/* --------------------------------------
+   ACCOUNTS PAGE CONTAINER
+   -------------------------------------- */
+   .accounts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 20px;
+  }
+  
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .tab {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #fff;
+    transition: background 0.3s;
+  }
+  .tab:hover {
+    background: rgba(255,255,255,0.3);
+  }
+  .tab.active {
+    background: rgba(255,255,255,0.4);
+    font-weight: 600;
+  }
+  .tab.add-new {
+    background: #6a5acd;
+  }
+  .tab.add-new:hover {
+    background: #5542b5;
+  }
+  
+  /* "All" => headings + row of cards */
+  #allViewContainer h2 {
+    font-size: 20px;
+    color: #333;
+    margin: 20px 0 10px;
+  }
+  #allViewContainer .accounts-grid {
+    margin-bottom: 30px;
+  }
+  
+  /* Grid => single category or each row in "All" */
+  .accounts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  
+  /* --------------------------------------
+     SHARED STYLES (CARD & TILE)
+     -------------------------------------- */
+  .account-item {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    min-height: 180px;
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    cursor: pointer; /* so we can click to open detail modal */
+  }
+  .account-item:hover {
+    transform: scale(1.03);
+  }
+  
+  /* HOVER TOOLTIP => summary info (balance, last tx, etc.) */
+  .account-tooltip {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.75);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    z-index: 99;
+    width: 160px;
+  }
+  .account-item:hover .account-tooltip {
+    display: block;
+  }
+  
+  /* --------------------------------------
+     1) CREDIT/DEBIT CARD STYLE
+     -------------------------------------- */
+  .card-style {
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Nunito', sans-serif;
+  }
+  
+  /* The gradient background (brand or fallback) */
+  .card-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 1;
+    background: linear-gradient(135deg, #555, #999);
+  }
+  
+  /* content above the background */
+  .card-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  /* brand-specific classes => override .card-bg gradient */
+  .brand-visa .card-bg {
+    background: linear-gradient(135deg, #1a1f71, #3b6cd4);
+  }
+  .brand-mastercard .card-bg {
+    background: linear-gradient(135deg, #C04848, #480048);
+  }
+  .brand-discover .card-bg {
+    background: linear-gradient(135deg, #F6D365, #FDA085);
+  }
+  .brand-other .card-bg {
+    background: linear-gradient(135deg, #555, #999);
+  }
+  
+  /* credit vs. debit label (optional) */
+  .card-style.credit::before {
+    content: "CREDIT";
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    font-size: 12px;
+    opacity: 0.7;
+  }
+  .card-style.debit::before {
+    content: "DEBIT";
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    font-size: 12px;
+    opacity: 0.7;
+  }
+  
+  /* brand logo => top-right */
+  .card-logo {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 50px;
+    height: auto;
+  }
+  .card-logo img {
+    width: 100%;
+    height: auto;
+  }
+  
+  /* chip => top-left */
+  .card-chip {
+    position: absolute;
+    top: 30px;
+    left: 20px;
+    width: 45px;
+    height: auto;
+  }
+  .card-chip img {
+    width: 100%;
+    height: auto;
+  }
+  
+  /* card number => near bottom-left */
+  .card-number {
+    position: absolute;
+    bottom: 60px;
+    left: 20px;
+    font-size: 1.2rem;
+    letter-spacing: 3px;
+  }
+  
+  /* cardholder / expiration labels */
+  .card-label-holder,
+  .card-label-exp {
+    position: absolute;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+  .card-label-holder {
+    bottom: 35px;
+    left: 20px;
+  }
+  .card-label-exp {
+    bottom: 35px;
+    right: 20px;
+  }
+  
+  /* actual cardholder name / expiration text */
+  .card-holder,
+  .card-expiration {
+    position: absolute;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .card-holder {
+    bottom: 20px;
+    left: 20px;
+  }
+  .card-expiration {
+    bottom: 20px;
+    right: 20px;
+  }
+  
+  /* --------------------------------------
+     2) NON-CARD TILE STYLE
+     -------------------------------------- */
+  .tile-style {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    font-family: 'Nunito', sans-serif;
+  }
+  
+  /* Distinct color for each category (Bank, Cash, Investment, Custom) */
+  .tile-bank {
+    background: linear-gradient(135deg, #74ABE2, #5563DE);
+  }
+  .tile-cash {
+    background: linear-gradient(135deg, #84fab0, #8fd3f4);
+  }
+  .tile-investment {
+    background: linear-gradient(135deg, #c1dfc4, #deecdd);
+  }
+  .tile-custom {
+    background: linear-gradient(135deg, #d9a7c7, #fffcdc);
+  }
+  /* fallback for unrecognized category */
+  .tile-other {
+    background: linear-gradient(135deg, #555, #999);
+  }
+  
+  /* tile content */
+  .tile-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .tile-balance {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .tile-lastTx {
+    font-size: 0.8rem;
+    opacity: 0.8;
+  }
+  
+  /* --------------------------------------
+     MODALS => Add/Edit + Detail
+     -------------------------------------- */
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    z-index: 9999;
+  }
+  .modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    max-width: 450px;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .modal-content h2 {
+    margin-bottom: 10px;
+  }
+  .modal-content label {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+  .modal-content input[type="text"],
+  .modal-content input[type="number"],
+  .modal-content select {
+    margin-top: 4px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+  
+  /* Buttons in the modals */
+  .modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .modal-buttons button {
+    background: #6a5acd;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .modal-buttons button:hover {
+    background: #5542b5;
+  }
+  
+  /* For the detail modal specifically (Edit, Delete, Close) */
+  #detailModalContent .modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  #detailModalContent .modal-buttons button {
+    background: #6a5acd;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  #detailModalContent .modal-buttons button:hover {
+    background: #5542b5;
+  }
+  
