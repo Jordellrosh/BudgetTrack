@@ -1,458 +1,412 @@
-/*******************************************************
- * budget.js - Simplified Advanced
- *
- * Single Bar Chart => "Spent vs Allocated"
- * Wizard always accessible via top "Launch Wizard" button
- * Add/Edit/Remove categories
- * No repeated re-renders => no infinite growth
- *******************************************************/
-document.addEventListener("DOMContentLoaded", () => {
-    /*****************************************************
-     * 0) STATE => budgets, wizard data
-     *****************************************************/
-    let budgets = [];
-    let nextID = 1; // for local
-    let editID = null;
+document.addEventListener("DOMContentLoaded", async () => {
+    // ====== SUPABASE INIT (Use your real credentials) ======
+    const supabaseUrl = 'YOUR_SUPABASE_URL';
+    const supabaseKey = 'YOUR_SUPABASE_KEY';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+  
+    // DOM references
+    const totalAllocatedEl = document.getElementById("totalAllocated");
+    const totalSpentEl = document.getElementById("totalSpent");
+    const categoryList = document.getElementById("categoryList");
+    const detailContent = document.getElementById("detailContent");
+    const btnAddCategory = document.getElementById("btnAddCategory");
   
     // Wizard
-    let monthlyIncome = 0;
-    let recommendedCats = [];
-  
-    // Chart
-    let barChart = null;
-  
-    /*****************************************************
-     * 1) DOM Elements
-     *****************************************************/
-    const btnLaunchWizard = document.getElementById("btnLaunchWizard");
-    const dateRangeSelect = document.getElementById("budgetDateRange");
-  
-    // Category list
-    const categoryListEl = document.getElementById("categoryList");
-  
-    // Single bar chart
-    const budgetBarEl = document.getElementById("spentVsAllocChart");
-  
-    // Wizard modal
     const wizardModal = document.getElementById("wizardModal");
-    const wizardContent = wizardModal.querySelector(".wizard-content");
+    const wizardErrorMsg = document.getElementById("wizardErrorMsg");
+    const stepCircles = document.querySelectorAll(".step-circle");
+    const step1 = document.querySelector(".step-1");
+    const step2 = document.querySelector(".step-2");
+    const wizardCancelBtn1 = document.getElementById("wizardCancelBtn1");
+    const wizardNextBtn1 = document.getElementById("wizardNextBtn1");
+    const wizardBackBtn2 = document.getElementById("wizardBackBtn2");
+    const wizardFinishBtn = document.getElementById("wizardFinishBtn");
   
-    const wizardStep1 = document.getElementById("wizardStep1");
-    const wizardStep2 = document.getElementById("wizardStep2");
-    const wizardStep3 = document.getElementById("wizardStep3");
+    const categoryNameInput = document.getElementById("categoryName");
+    const allocatedAmountInput = document.getElementById("allocatedAmount");
+    const iconGrid = document.getElementById("iconGrid");
+    let selectedIcon = null;
+    let currentStep = 1;
   
-    const wizardIncomeInput = document.getElementById("wizardIncome");
-    const wizardCatList = document.getElementById("wizardCatList");
-    const wizardReviewList = document.getElementById("wizardReviewList");
-    const wizardReviewText = document.getElementById("wizardReviewText");
+    // Edit
+    const editModal = document.getElementById("editModal");
+    const editErrorMsg = document.getElementById("editErrorMsg");
+    const editCategoryNameInput = document.getElementById("editCategoryName");
+    const editAllocatedAmountInput = document.getElementById("editAllocatedAmount");
+    const editCancelBtn = document.getElementById("editCancelBtn");
+    const editSaveBtn = document.getElementById("editSaveBtn");
+    let editCategoryId = null;
   
-    const btnNextStep1 = document.getElementById("btnNextStep1");
-    const btnPrevStep2 = document.getElementById("btnPrevStep2");
-    const btnNextStep2 = document.getElementById("btnNextStep2");
-    const btnPrevStep3 = document.getElementById("btnPrevStep3");
-    const btnFinishWizard = document.getElementById("btnFinishWizard");
+    // Delete
+    const deleteModal = document.getElementById("deleteModal");
+    const deleteMessage = document.getElementById("deleteMessage");
+    const deleteCancelBtn = document.getElementById("deleteCancelBtn");
+    const deleteConfirmBtn = document.getElementById("deleteConfirmBtn");
+    let deleteCategoryId = null;
   
-    // We'll create a "Cancel Wizard" button at runtime
-    let btnCancelWizard = null;
+    // State
+    let categories = [];
+    let transactions = [];
   
-    // Add/Edit modal
-    const budgetModal = document.getElementById("budgetModal");
-    const modalTitle = document.getElementById("modalTitle");
-    const modalCatName = document.getElementById("modalCatName");
-    const modalCatAllocated = document.getElementById("modalCatAllocated");
-    const modalCatPeriod = document.getElementById("modalCatPeriod");
-    const btnSaveBudget = document.getElementById("btnSaveBudget");
-    const btnCancelBudget = document.getElementById("btnCancelBudget");
+    // ===========================
+    // LOAD DATA
+    // ===========================
+    async function loadData() {
+      // categories
+      const { data: catData, error: catError } = await supabase
+        .from("Category")
+        .select("*");
+      if (catError) {
+        console.error("Error loading categories:", catError);
+        categories = [];
+      } else {
+        categories = catData || [];
+      }
   
-    /*****************************************************
-     * 2) INIT => load DB, add wizard cancel, render
-     *****************************************************/
-    async function init() {
-      await loadBudgetsFromDB();
+      // transactions
+      const { data: txData, error: txError } = await supabase
+        .from("Transaction")
+        .select("*");
+      if (txError) {
+        console.error("Error loading transactions:", txError);
+        transactions = [];
+      } else {
+        transactions = txData || [];
+      }
   
-      addWizardCancelButton();
-      renderPage();
-    }
-  
-    async function loadBudgetsFromDB() {
-      // e.g. supabase call
-      // For local dev:
-      budgets = [];
-      nextID = 1;
-    }
-  
-    function addWizardCancelButton() {
-      btnCancelWizard = document.createElement("button");
-      btnCancelWizard.textContent = "Cancel Wizard";
-      btnCancelWizard.style.position = "absolute";
-      btnCancelWizard.style.top = "10px";
-      btnCancelWizard.style.right = "10px";
-      btnCancelWizard.style.background = "#f44336";
-      btnCancelWizard.style.color = "#fff";
-      btnCancelWizard.style.border = "none";
-      btnCancelWizard.style.padding = "6px 12px";
-      btnCancelWizard.style.borderRadius = "6px";
-      btnCancelWizard.style.cursor = "pointer";
-      btnCancelWizard.addEventListener("click", closeWizard);
-      wizardContent.style.position = "relative";
-      wizardContent.appendChild(btnCancelWizard);
-    }
-  
-    /*****************************************************
-     * 3) RENDER => categories, chart
-     *****************************************************/
-    function renderPage() {
+      renderSummary();
       renderCategories();
-      renderBarChart();
     }
   
-    /*****************************************************
-     * 3a) Render Categories => each tile
-     *****************************************************/
+    // ===========================
+    // RENDER SUMMARY
+    // ===========================
+    function renderSummary() {
+      let totalAllocated = 0;
+      let totalSpent = 0;
+  
+      categories.forEach(cat => {
+        totalAllocated += cat.allocated || 0;
+        let catSpent = 0;
+        transactions.forEach(tx => {
+          if (tx.category_id === cat.id) {
+            catSpent += Math.abs(tx.amount);
+          }
+        });
+        totalSpent += catSpent;
+      });
+  
+      totalAllocatedEl.textContent = `$${totalAllocated.toFixed(2)}`;
+      totalSpentEl.textContent = `$${totalSpent.toFixed(2)}`;
+    }
+  
+    // ===========================
+    // RENDER CATEGORIES
+    // ===========================
     function renderCategories() {
-      categoryListEl.innerHTML = "";
-  
-      // Add Budget button
-      const addBtn = document.createElement("button");
-      addBtn.classList.add("add-budget-btn");
-      addBtn.textContent = "+ Add Budget Category";
-      addBtn.addEventListener("click", openModalForNew);
-      categoryListEl.appendChild(addBtn);
-  
-      // If no budgets => show message
-      if (budgets.length === 0) {
-        const msg = document.createElement("p");
-        msg.textContent = "No budget categories yet. Add one or launch the wizard!";
-        msg.style.marginTop = "10px";
-        categoryListEl.appendChild(msg);
+      categoryList.innerHTML = "";
+      if (categories.length === 0) {
+        const li = document.createElement("li");
+        li.textContent = "No categories yet.";
+        li.style.opacity = "0.7";
+        categoryList.appendChild(li);
         return;
       }
   
-      // Otherwise, list each budget
-      budgets.forEach(b => {
-        const tile = document.createElement("div");
-        tile.classList.add("budget-category-tile");
+      categories.forEach(cat => {
+        const li = document.createElement("li");
+        li.classList.add("category-item");
   
-        // header
-        const header = document.createElement("div");
-        header.classList.add("tile-header");
+        const infoDiv = document.createElement("div");
+        infoDiv.classList.add("category-info");
   
-        const title = document.createElement("h3");
-        title.textContent = b.category || "Untitled";
+        const nameEl = document.createElement("div");
+        nameEl.classList.add("category-name");
+        nameEl.textContent = cat.name;
+        if (cat.icon) {
+          nameEl.innerHTML = `<i class="${cat.icon}" style="margin-right:6px;"></i>` + nameEl.textContent;
+        }
   
-        const iconsDiv = document.createElement("div");
-        iconsDiv.classList.add("tile-icons");
+        const allocEl = document.createElement("div");
+        allocEl.classList.add("category-allocated");
+        allocEl.textContent = `Allocated: $${(cat.allocated||0).toFixed(2)}`;
   
-        // edit
+        infoDiv.appendChild(nameEl);
+        infoDiv.appendChild(allocEl);
+  
+        // actions
+        const actionsDiv = document.createElement("div");
+        actionsDiv.classList.add("category-actions");
+  
         const editIcon = document.createElement("i");
-        editIcon.classList.add("fa", "fa-edit");
-        editIcon.title = "Edit Budget";
-        editIcon.addEventListener("click", (e) => {
+        editIcon.classList.add("fa", "fa-pen");
+        editIcon.title = "Edit Category";
+        editIcon.addEventListener("click", (e)=>{
           e.stopPropagation();
-          openModalForEdit(b);
+          openEditModal(cat);
         });
   
-        // delete
-        const delIcon = document.createElement("i");
-        delIcon.classList.add("fa", "fa-trash");
-        delIcon.title = "Delete Budget";
-        delIcon.addEventListener("click", async (e) => {
+        const trashIcon = document.createElement("i");
+        trashIcon.classList.add("fa", "fa-trash");
+        trashIcon.title = "Delete Category";
+        trashIcon.addEventListener("click", (e)=>{
           e.stopPropagation();
-          if (confirm(`Delete ${b.category}?`)) {
-            await deleteBudgetFromDB(b.id);
-            renderPage();
-          }
+          openDeleteModal(cat);
         });
   
-        iconsDiv.appendChild(editIcon);
-        iconsDiv.appendChild(delIcon);
+        actionsDiv.appendChild(editIcon);
+        actionsDiv.appendChild(trashIcon);
   
-        header.appendChild(title);
-        header.appendChild(iconsDiv);
+        li.appendChild(infoDiv);
+        li.appendChild(actionsDiv);
   
-        // stats
-        const stats = document.createElement("div");
-        stats.classList.add("tile-stats");
-  
-        const allocatedDiv = document.createElement("div");
-        allocatedDiv.innerHTML = `<strong>Allocated</strong> <span>${formatCurrency(b.allocated || 0)}</span>`;
-  
-        const spentDiv = document.createElement("div");
-        spentDiv.innerHTML = `<strong>Spent</strong> <span>${formatCurrency(b.spent || 0)}</span>`;
-  
-        const remainingVal = (b.allocated || 0) - (b.spent || 0);
-        const remainingDiv = document.createElement("div");
-        remainingDiv.innerHTML = `<strong>Remaining</strong> <span>${formatCurrency(remainingVal)}</span>`;
-  
-        stats.appendChild(allocatedDiv);
-        stats.appendChild(spentDiv);
-        stats.appendChild(remainingDiv);
-  
-        // progress
-        const progressContainer = document.createElement("div");
-        progressContainer.classList.add("progress-bar");
-  
-        const progressFill = document.createElement("div");
-        progressFill.classList.add("progress-fill");
-  
-        const pct = (b.allocated > 0) ? ((b.spent || 0) / b.allocated) * 100 : 0;
-        progressFill.style.width = Math.min(pct, 100) + "%";
-  
-        if (pct >= 100) {
-          progressFill.classList.add("danger");
-        } else if (pct >= 80) {
-          progressFill.classList.add("warning");
-        }
-  
-        progressContainer.appendChild(progressFill);
-  
-        tile.appendChild(header);
-        tile.appendChild(stats);
-        tile.appendChild(progressContainer);
-  
-        categoryListEl.appendChild(tile);
+        li.addEventListener("click", ()=>showCategoryDetail(cat));
+        categoryList.appendChild(li);
       });
     }
   
-    /*****************************************************
-     * 3b) Render single bar chart => "Spent vs Allocated"
-     *****************************************************/
-    function renderBarChart() {
-      if (!budgetBarEl) return;
+    // ===========================
+    // SHOW CATEGORY DETAIL
+    // ===========================
+    function showCategoryDetail(cat) {
+      detailContent.innerHTML = `<h2>${cat.name} Details</h2>`;
   
-      // If no budgets => destroy if existing, skip
-      if (budgets.length === 0) {
-        if (barChart) {
-          barChart.destroy();
-          barChart = null;
-        }
-        return;
-      }
-  
-      // destroy old chart
-      if (barChart) {
-        barChart.destroy();
-        barChart = null;
-      }
-  
-      // data
-      const labels = budgets.map(b => b.category);
-      const dataAlloc = budgets.map(b => b.allocated || 0);
-      const dataSpent = budgets.map(b => b.spent || 0);
-  
-      const ctx = budgetBarEl.getContext("2d");
-      barChart = new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels,
-          datasets: [
-            {
-              label: "Allocated",
-              data: dataAlloc,
-              backgroundColor: "rgba(102, 153, 255, 0.7)"
-            },
-            {
-              label: "Spent",
-              data: dataSpent,
-              backgroundColor: "rgba(255, 99, 132, 0.7)"
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: { beginAtZero: true }
-          },
-          plugins: {
-            legend: { position: "bottom" }
-          }
-        }
+      let spent = 0;
+      const catTx = transactions.filter(tx => tx.category_id === cat.id);
+      catTx.forEach(tx => {
+        spent += Math.abs(tx.amount);
       });
+  
+      const allocated = cat.allocated || 0;
+      const usedPercent = allocated > 0 ? (spent / allocated)*100 : 0;
+      const clamped = Math.min(usedPercent, 100);
+  
+      // stats
+      const statsDiv = document.createElement("div");
+      statsDiv.classList.add("spent-stats");
+      statsDiv.innerHTML = `
+        <span>Allocated: $${allocated.toFixed(2)}</span>
+        <span>Spent: $${spent.toFixed(2)}</span>
+      `;
+      detailContent.appendChild(statsDiv);
+  
+      // progress bar
+      const progBar = document.createElement("div");
+      progBar.classList.add("spent-progress");
+      const fill = document.createElement("div");
+      fill.classList.add("spent-fill");
+      fill.style.width = `${clamped}%`;
+  
+      // color if over 100%
+      if (usedPercent >= 100) {
+        fill.style.background = "linear-gradient(90deg, #ff4444, #ff8888)";
+      }
+      progBar.appendChild(fill);
+      detailContent.appendChild(progBar);
+  
+      // If category has notes or other fields, show them (optional)
+      if (cat.notes) {
+        const p = document.createElement("p");
+        p.textContent = `Notes: ${cat.notes}`;
+        p.style.opacity = "0.8";
+        detailContent.appendChild(p);
+      }
+  
+      // transactions table
+      if (catTx.length > 0) {
+        const txTable = document.createElement("table");
+        txTable.classList.add("transaction-table");
+        txTable.innerHTML = `
+          <thead>
+            <tr><th>Amount</th><th>Date</th></tr>
+          </thead>
+          <tbody></tbody>
+        `;
+        const tbody = txTable.querySelector("tbody");
+        catTx.forEach(tx => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>$${Math.abs(tx.amount).toFixed(2)}</td>
+            <td>${tx.date ? new Date(tx.date).toLocaleDateString() : "--"}</td>
+          `;
+          tbody.appendChild(row);
+        });
+        detailContent.appendChild(txTable);
+      } else {
+        const noTx = document.createElement("p");
+        noTx.textContent = "No transactions for this category.";
+        noTx.style.opacity = "0.7";
+        detailContent.appendChild(noTx);
+      }
     }
   
-    /*****************************************************
-     * 4) Wizard => multi-step
-     *****************************************************/
-    btnLaunchWizard.addEventListener("click", openWizard);
-  
+    // ===========================
+    // ADD CATEGORY (2-step wizard)
+    // ===========================
+    btnAddCategory.addEventListener("click", openWizard);
     function openWizard() {
-      wizardModal.style.display = "flex";
-      wizardStep1.style.display = "block";
-      wizardStep2.style.display = "none";
-      wizardStep3.style.display = "none";
+      wizardModal.classList.add("show");
+      currentStep = 1;
+      selectedIcon = null;
+      categoryNameInput.value = "";
+      allocatedAmountInput.value = "";
+      wizardErrorMsg.style.display = "none";
+      updateWizardStep();
     }
     function closeWizard() {
-      wizardModal.style.display = "none";
+      wizardModal.classList.remove("show");
+    }
+    function updateWizardStep() {
+      stepCircles.forEach(sc => {
+        const s = parseInt(sc.getAttribute("data-step"));
+        sc.classList.toggle("active", s===currentStep);
+      });
+      step1.style.display = (currentStep===1) ? "block" : "none";
+      step2.style.display = (currentStep===2) ? "block" : "none";
+    }
+    function showWizardError(msg) {
+      wizardErrorMsg.textContent = msg;
+      wizardErrorMsg.style.display = "block";
     }
   
-    // We'll create a "Cancel Wizard" button in top-right
-    function createRecommendedCats() {
-      recommendedCats = [
-        { name: "Rent/Mortgage", percent: 30 },
-        { name: "Groceries", percent: 10 },
-        { name: "Utilities", percent: 5 },
-        { name: "Transportation", percent: 10 },
-        { name: "Entertainment", percent: 5 },
-        { name: "Savings", percent: 10 }
-      ];
-    }
-  
-    btnNextStep1.addEventListener("click", () => {
-      monthlyIncome = parseFloat(wizardIncomeInput.value) || 0;
-      wizardStep1.style.display = "none";
-      wizardStep2.style.display = "block";
-      wizardCatList.innerHTML = "";
-      createRecommendedCats();
-      recommendedCats.forEach((rc, i) => {
-        const row = document.createElement("div");
-        row.style.marginBottom = "6px";
-        const defAlloc = (monthlyIncome * (rc.percent / 100)).toFixed(2);
-        row.innerHTML = `
-          <label>
-            ${rc.name}
-            <input type="number" value="${defAlloc}" data-index="${i}" style="margin-left:6px; width:80px;" />
-          </label>
-        `;
-        wizardCatList.appendChild(row);
-      });
+    wizardCancelBtn1.addEventListener("click", closeWizard);
+    wizardNextBtn1.addEventListener("click", () => {
+      const nameVal = categoryNameInput.value.trim();
+      const allocVal = parseFloat(allocatedAmountInput.value) || 0;
+      if (!nameVal || allocVal<=0) {
+        showWizardError("Please enter a valid name and allocated amount.");
+        return;
+      }
+      wizardErrorMsg.style.display = "none";
+      currentStep = 2;
+      updateWizardStep();
     });
-  
-    btnPrevStep2.addEventListener("click", () => {
-      wizardStep2.style.display = "none";
-      wizardStep1.style.display = "block";
+    wizardBackBtn2.addEventListener("click", () => {
+      currentStep = 1;
+      updateWizardStep();
     });
-    btnNextStep2.addEventListener("click", () => {
-      const inputs = wizardCatList.querySelectorAll("input[type='number']");
-      inputs.forEach(inp => {
-        const idx = parseInt(inp.getAttribute("data-index"));
-        recommendedCats[idx].amount = parseFloat(inp.value) || 0;
-      });
-      wizardStep2.style.display = "none";
-      wizardStep3.style.display = "block";
-      wizardReviewList.innerHTML = "";
-      wizardReviewText.textContent = `Based on your monthly income of $${monthlyIncome}, here's your initial budget:`;
-      recommendedCats.forEach(rc => {
-        const row = document.createElement("p");
-        row.textContent = `${rc.name}: $${rc.amount.toFixed(2)}`;
-        wizardReviewList.appendChild(row);
-      });
-    });
-  
-    btnPrevStep3.addEventListener("click", () => {
-      wizardStep3.style.display = "none";
-      wizardStep2.style.display = "block";
-    });
-    btnFinishWizard.addEventListener("click", async () => {
-      for (let rc of recommendedCats) {
-        const newBudget = {
-          category: rc.name,
-          allocated: rc.amount,
-          spent: 0,
-          period: "monthly"
-        };
-        await saveBudgetToDB(newBudget);
+    wizardFinishBtn.addEventListener("click", async () => {
+      const nameVal = categoryNameInput.value.trim();
+      const allocVal = parseFloat(allocatedAmountInput.value) || 0;
+      if (!nameVal || allocVal<=0) {
+        showWizardError("Please enter valid name and allocated amount.");
+        return;
+      }
+      // Insert into DB
+      const { error } = await supabase
+        .from("Category")
+        .insert([{ name: nameVal, allocated: allocVal, icon: selectedIcon }]);
+      if (error) {
+        console.error("Error adding category:", error);
+        showWizardError("Error adding category. Check console for details.");
+        return;
       }
       closeWizard();
-      renderPage();
+      await loadData();
     });
   
-    // add a "Cancel Wizard" button at runtime
-    function addWizardCancelButton() {
-      const btnCancel = document.createElement("button");
-      btnCancel.textContent = "Cancel Wizard";
-      btnCancel.style.position = "absolute";
-      btnCancel.style.top = "10px";
-      btnCancel.style.right = "10px";
-      btnCancel.style.background = "#f44336";
-      btnCancel.style.color = "#fff";
-      btnCancel.style.border = "none";
-      btnCancel.style.padding = "6px 12px";
-      btnCancel.style.borderRadius = "6px";
-      btnCancel.style.cursor = "pointer";
-      btnCancel.addEventListener("click", closeWizard);
-      wizardContent.style.position = "relative";
-      wizardContent.appendChild(btnCancel);
+    // ICON GRID
+    const iconOptions = [
+      { class:"fa fa-utensils", label:"Food" },
+      { class:"fa fa-home", label:"Home" },
+      { class:"fa fa-bolt", label:"Utilities" },
+      { class:"fa fa-car", label:"Car" },
+      { class:"fa fa-heart", label:"Health" },
+      { class:"fa fa-film", label:"Entertainment" },
+      { class:"fa fa-shopping-cart", label:"Shopping" },
+      { class:"fa fa-ellipsis-h", label:"Misc" }
+    ];
+    function renderIconGrid() {
+      iconGrid.innerHTML = "";
+      iconOptions.forEach(opt => {
+        const div = document.createElement("div");
+        div.classList.add("icon-option");
+        div.innerHTML = `<i class="${opt.class}" style="font-size:24px;"></i>`;
+        div.title = opt.label;
+        div.addEventListener("click", ()=>{
+          document.querySelectorAll(".icon-option").forEach(el=>el.classList.remove("selected"));
+          div.classList.add("selected");
+          selectedIcon = opt.class;
+        });
+        iconGrid.appendChild(div);
+      });
     }
+    renderIconGrid();
   
-    /*****************************************************
-     * 5) Add/Edit Budget Modal
-     *****************************************************/
-    function openModalForNew() {
-      editID = null;
-      modalTitle.textContent = "Add Budget Category";
-      modalCatName.value = "";
-      modalCatAllocated.value = "";
-      modalCatPeriod.value = "monthly";
-      budgetModal.style.display = "flex";
+    // ===========================
+    // EDIT CATEGORY
+    // ===========================
+    function openEditModal(cat) {
+      editModal.classList.add("show");
+      editCategoryId = cat.id;
+      editErrorMsg.style.display = "none";
+      editCategoryNameInput.value = cat.name;
+      editAllocatedAmountInput.value = cat.allocated;
     }
-  
-    function openModalForEdit(b) {
-      editID = b.id;
-      modalTitle.textContent = "Edit Budget Category";
-      modalCatName.value = b.category || "";
-      modalCatAllocated.value = b.allocated || 0;
-      modalCatPeriod.value = b.period || "monthly";
-      budgetModal.style.display = "flex";
+    function closeEditModal() {
+      editModal.classList.remove("show");
     }
-  
-    btnSaveBudget.addEventListener("click", async () => {
-      const catName = modalCatName.value.trim() || "Untitled";
-      const allocatedVal = parseFloat(modalCatAllocated.value) || 0;
-      const periodVal = modalCatPeriod.value;
-  
-      if (editID) {
-        let existing = budgets.find(b => b.id === editID);
-        if (existing) {
-          existing.category = catName;
-          existing.allocated = allocatedVal;
-          existing.period = periodVal;
-          // spent stays the same
-          await updateBudgetInDB(existing);
-        }
-        editID = null;
-      } else {
-        const newB = {
-          category: catName,
-          allocated: allocatedVal,
-          spent: 0,
-          period: periodVal
-        };
-        await saveBudgetToDB(newB);
+    editSaveBtn.addEventListener("click", async ()=>{
+      const newName = editCategoryNameInput.value.trim();
+      const newAlloc = parseFloat(editAllocatedAmountInput.value) || 0;
+      if(!newName || newAlloc<=0) {
+        editErrorMsg.textContent = "Please enter a valid name and allocated amount.";
+        editErrorMsg.style.display = "block";
+        return;
       }
-      closeBudgetModal();
-      renderPage();
-    });
-  
-    btnCancelBudget.addEventListener("click", () => {
-      closeBudgetModal();
-    });
-  
-    budgetModal.addEventListener("click", (e) => {
-      if (e.target === budgetModal) {
-        closeBudgetModal();
+      const { error } = await supabase
+        .from("Category")
+        .update({ name: newName, allocated: newAlloc })
+        .eq("id", editCategoryId);
+      if(error) {
+        console.error("Error updating category:", error);
+        editErrorMsg.textContent = "Error updating category. Check console.";
+        editErrorMsg.style.display = "block";
+        return;
       }
+      closeEditModal();
+      loadData();
+    });
+    editCancelBtn.addEventListener("click", closeEditModal);
+  
+    // ===========================
+    // DELETE CATEGORY
+    // ===========================
+    function openDeleteModal(cat) {
+      deleteModal.classList.add("show");
+      deleteCategoryId = cat.id;
+      deleteMessage.textContent = `Are you sure you want to delete "${cat.name}"?`;
+    }
+    function closeDeleteModal() {
+      deleteModal.classList.remove("show");
+    }
+    deleteConfirmBtn.addEventListener("click", async ()=>{
+      if(!deleteCategoryId) return;
+      const { error } = await supabase
+        .from("Category")
+        .delete()
+        .eq("id", deleteCategoryId);
+      if(error) {
+        console.error("Error deleting category:", error);
+        return;
+      }
+      closeDeleteModal();
+      loadData();
+    });
+    deleteCancelBtn.addEventListener("click", closeDeleteModal);
+  
+    // ===========================
+    // BACKDROP CLOSE
+    // ===========================
+    window.addEventListener("click", (e) => {
+      if (e.target===wizardModal) closeWizard();
+      if (e.target===editModal) closeEditModal();
+      if (e.target===deleteModal) closeDeleteModal();
     });
   
-    function closeBudgetModal() {
-      budgetModal.style.display = "none";
-    }
-  
-    /*****************************************************
-     * 6) HELPER + Start
-     *****************************************************/
-    dateRangeSelect.addEventListener("change", () => {
-      console.log("Date range changed:", dateRangeSelect.value);
-      // e.g. re-fetch budgets for that range
-    });
-  
-    function formatCurrency(num) {
-      return `$${(num || 0).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      })}`;
-    }
-  
-    init();
+    // ===========================
+    // INIT
+    // ===========================
+    await loadData();
   });
   
